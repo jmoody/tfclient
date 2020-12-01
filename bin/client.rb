@@ -11,17 +11,12 @@ module TextFlight
   class CLI
 
     def self.read_response(socket:)
-      lines = []
+      # Maybe this pattern?
+      # https://stackoverflow.com/questions/12653532/how-to-create-non-blocking-tcp-server-and-tcp-socket-in-ruby-only-the-following
 
-      timeout = Time.now + 5
+      lines = []
       begin
         loop do
-
-          # if socket.wait_readable(1.0) != true
-          #   puts "waited for 1 seconds for socket to be readable before breaking"
-          #   break
-          # end
-          #
           response = socket.gets
 
           # nil means socket has set EOF
@@ -35,19 +30,7 @@ module TextFlight
               puts "received prompt, end of input; breaking '#{response.chomp}'"
               break
             end
-
-            if response[/Chat with us on Freenode!/]
-              puts "received freenode message; breaking"
-              lines << response.chomp!
-              break
-            end
-
             lines << response.chomp!
-
-            if Time.now > timeout
-              puts "waited 7 seconds; breaking"
-              break
-            end
           end
         end
       rescue IOError => e
@@ -66,7 +49,6 @@ module TextFlight
 
     def self.handle_beginning_text(socket:)
       lines = []
-      timeout = Time.now + 5
       begin
         loop do
           response = socket.gets
@@ -80,13 +62,6 @@ module TextFlight
               break
             end
           end
-
-          if Time.now > timeout
-            puts "waited 5 seconds; breaking"
-            break
-          end
-
-          sleep(0.1)
         end
       rescue IOError => e
         puts e.message
@@ -100,12 +75,9 @@ module TextFlight
 
     def self.login(socket:)
       puts("=== LOGIN ===")
-      sleep(1.0)
       socket.puts("login abc 1234")
 
       lines = []
-      timeout = Time.now + 5
-
       prompt_count = 0
       begin
         loop do
@@ -115,7 +87,7 @@ module TextFlight
           if response.length != 0
             if response[0] == ">" && prompt_count == 0
               prompt_count = prompt_count + 1
-              lines << TFClient::StringUtils.remove_control_chars(response).chomp
+              lines << TFClient::StringUtils.remove_terminal_control_chars(string: response).chomp
               puts "received first prompt, removed ctl chars: '#{lines.last}'"
               sleep(0.1)
               next
@@ -123,7 +95,7 @@ module TextFlight
 
             if response[0] == ">"  && prompt_count == 1
               prompt_count = prompt_count + 1
-              lines << TFClient::StringUtils.remove_control_chars(response).chomp
+              lines << TFClient::StringUtils.remove_terminal_control_chars(string: response).chomp
               puts "received second prompt; breaking: '#{lines.last}'"
               break
             end
@@ -140,16 +112,9 @@ module TextFlight
             end
 
             #puts "received text (truncated): '#{response.chomp}'"
+            response = TFClient::StringUtils.remove_color_control_chars(string: response)
             lines << response.chomp
           end
-
-          if Time.now > timeout
-            puts "waited 5 seconds; breaking"
-            break
-          end
-
-          puts "elapsed = #{Time.now - timeout}"
-          sleep(0.1)
         end
       rescue IOError => e
         puts e.message
@@ -166,7 +131,7 @@ module TextFlight
       @socket = socket
       TextFlight::CLI.handle_beginning_text(socket: @socket)
       TextFlight::CLI.login(socket: @socket)
-      #read_eval_print
+      read_eval_print
     end
 
     def read_eval_print

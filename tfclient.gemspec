@@ -43,7 +43,7 @@ https://leagueh.xyz/git/textflight/
   ].flatten
 
   spec.bindir        = "bin"
-  spec.executables   = Dir.glob("{bin}/**/*")
+  spec.executables   = ["client.rb"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency("json")
