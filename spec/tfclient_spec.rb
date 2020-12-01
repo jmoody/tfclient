@@ -1,6 +1,6 @@
-RSpec.describe Tfclient do
+RSpec.describe TFClient do
   it "has a version number" do
-    expect(Tfclient::VERSION).not_to be nil
+    expect(TFClient::VERSION).not_to be nil
   end
 
   it "does something useful" do
