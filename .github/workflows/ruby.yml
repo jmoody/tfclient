@@ -26,5 +26,7 @@ jobs:
         ruby-version: 2.7
     - name: Install dependencies
       run: bundle install
-    - name: Run tests
-      run: bundle rspec spec
+    - name: rspec unit
+      run: bundle rspec spec/lib
+    - name: audit
+      run: bundle audit check --update

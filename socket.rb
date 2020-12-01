@@ -4,14 +4,9 @@ require "openssl"
 require "thread"
 require "socket"
 require "readline"
+require_relative "lib/tfclient/string_utils"
+require "pry"
 
-class String
-  def strip_control_characters!
-    chars.each_with_object("") do |char, str|
-      str << char if !(char.ascii_only? && (char.ord < 32 || char.ord == 127))
-    end
-  end
-end
 
 class Client
 
@@ -38,6 +33,7 @@ class Client
     response = nil
     loop do
       response = @socket.gets.dump
+
 
       if response
         response.chomp!
@@ -80,6 +76,9 @@ class Client
         puts "eval"
         loop do
           response = @socket.gets.dump
+          binding.pry
+
+          response = TFClient::StringUtils.remove_control_chars(response)
 
           if response[0] == '>'
             puts "[trimming]"

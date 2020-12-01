@@ -26,6 +26,7 @@ tmp
 .idea/workspace.xml
 .idea/misc.xml
 .idea/.rakeTasks
+.idea/client.iml
 
 # MacOS
 .DS_Store

@@ -18,7 +18,7 @@ into a valid version, e.g. 1.2.3 or 1.2.3.pre10
   spec.authors       = ["Joshua Moody"]
   spec.email         = ["jmoody@github.com"]
 
-  spec.summary       = %q{A command-line client for the TextFlight}
+  spec.summary       = %q{A command-line client for the TextFlight.}
   spec.description   = %q{TextFlight is a space-based text adventure MMO.
 
 https://leagueh.xyz/tf/
@@ -54,8 +54,9 @@ https://leagueh.xyz/git/textflight/
   spec.add_development_dependency("guard-rspec", "~> 4.0")
   spec.add_development_dependency("terminal-notifier", "~> 2.0")
   spec.add_development_dependency("terminal-notifier-guard", "~> 1.0")
-  spec.add_development_dependency("guard-bundler", "~> 2.0")
+  spec.add_development_dependency("guard-bundler", "~> 3.0")
   spec.add_development_dependency("stub_env", ">= 1.0.4", "< 2.0")
   spec.add_development_dependency("pry", "~> 0.13")
   spec.add_development_dependency("irb", "~> 1.2")
+  spec.add_development_dependency("bundler-audit", "~> 0.7")
 end

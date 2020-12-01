@@ -1,44 +1,57 @@
-# Tfclient
+## TextFlight Client
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tfclient`. To experiment with that code, run `bin/console` for an interactive prompt.
+A command-line client for the TextFlight.
 
-TODO: Delete this and the text above, and describe your gem
+TextFlight is a space-based text adventure MMO.
 
-## Installation
+https://leagueh.xyz/tf/
+https://leagueh.xyz/git/textflight/
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'tfclient'
+```
+# TextFlight character
+jmoody
+faction: nibiru
 ```
 
-And then execute:
+One of the first computer games I played was Zork I on an Apple IIc.  The first
+program of any significance that I wrote was a text-based adventure in C# based
+on my experiences as student worker at the Physical Sciences library at UMass
+Amherst.  I played way too much BatMUD in the early nineties and early 2000s.
 
-    $ bundle install
+### Developing
 
-Or install it yourself as:
+I develop and test on macOS.  The GitHub Actions run rspec tests on Ubuntu,
 
-    $ gem install tfclient
+To run integration tests, the TextFlight server needs to be running.
 
-## Usage
+```
+$ git clone https://leagueh.xyz/git/textflight/.git/ 
+```
 
-TODO: Write usage instructions here
+The server requires Python 3.x; I use 3.9.0.  I use pyenv to manage Python
+versions. Other than that, I don't know anything about Python (my Algorithms
+class at Smith in 2001 was in Python...) or how to configure Python on macOS.
 
-## Development
+```
+# Run the server like this:
+$ cd testflight
+$ src/main.py
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+I would like to make a Docker container to host the server...
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+### Test
 
-## Contributing
+```
+$ bundle install
+$ bundle exec spec/lib
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tfclient. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/tfclient/blob/master/CODE_OF_CONDUCT.md).
+Integration tests require standing up the TextFlight server locally (see the
+Developing section above).
 
+```
+$ bundle install
+$ bundle  exec spec/integration
+```
 
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Tfclient project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/tfclient/blob/master/CODE_OF_CONDUCT.md).

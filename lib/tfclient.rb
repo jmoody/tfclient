@@ -1,6 +1,6 @@
 require "tfclient/version"
+require "tfclient/string_utils"
 
-module Tfclient
-  class Error < StandardError; end
-  # Your code goes here...
+module TFClient
+
 end
