@@ -62,3 +62,4 @@ $ bundle  exec spec/integration
 - [x] if we send commands too fast, the socket buffer fills and the server cannot respond
 - [x] we need a way of reading until there is no more output.  a non-blocking read on the socket
 - [ ] consolidate special case read_response methods into one method. WOOT!
+- [ ] add a logger
