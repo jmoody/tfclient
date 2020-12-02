@@ -11,34 +11,59 @@ module TextFlight
   class CLI
 
     def self.read_response(socket:)
-      # Maybe this pattern?
-      # https://stackoverflow.com/questions/12653532/how-to-create-non-blocking-tcp-server-and-tcp-socket-in-ruby-only-the-following
+      timeout = 5.0
+      ready = IO.select([socket], nil, nil, timeout)
 
-      lines = []
+      if !ready
+        message = "Timed out waiting for socket to response after #{timeout} seconds"
+        socket.close if socket.present?
+        raise message
+      end
+
+      buffer = ""
+      max_tries = 5
+      tries = 1
       begin
         loop do
-          response = socket.gets
+          response = socket.read_nonblock(4096, exception: false)
 
-          # nil means socket has set EOF
-          if response.nil?
-            raise "server set EOF"
-          end
-
-          if response.length != 0
-            puts "received response of length: #{response.length}"
-            if response[0] == ">"
-              puts "received prompt, end of input; breaking '#{response.chomp}'"
+          if response == :wait_readable
+            if tries < max_tries
+              puts "received :wait_readable on try: #{tries} of #{max_tries}; retrying"
+              tries = tries + 1
+              next
+            else
+              puts "received :wait_readable on try: #{tries} of #{max_tries}; breaking"
               break
             end
-            lines << response.chomp!
           end
+
+          puts "received #{response.bytesize} bytes; pushing onto buffer"
+          response.delete_prefix!("> ")
+          response.delete_suffix!("> ")
+          buffer = buffer + response
+
+          sleep(0.1)
         end
-      rescue IOError => e
-        puts e.message
-        # e.backtrace
+      rescue StandardError, IOError => e
+        message = <<~EOM
+          Caught error while reading from socket:
+
+          #{e.message}
+
+          after reading #{buffer.bytesize} from socket:
+
+          #{buffer}
+        EOM
         socket.close
+        raise(e.class, message)
       end
-      lines
+
+      return buffer.lines(chomp:true).map do |line|
+        line.strip
+      end.reject do |line|
+        line.length == 0
+      end
     end
 
     def self.parse_response(response:)
@@ -122,11 +147,9 @@ module TextFlight
 
     def self.enable_client_mode(socket:)
       puts("=== ENABLE CLIENT MODE ===")
-      binding.pry
       socket.puts("language client")
 
       lines = []
-      #prompt_count = 0
       begin
         loop do
           response = socket.gets
@@ -138,19 +161,10 @@ module TextFlight
 
           if response.length != 0
             if response[/Updated language.|Updated language./]
-              puts "received updated mode message; breaking '#{response}'"
+              puts "received updated mode message; breaking '#{response.chomp}'"
               break
             end
 
-            # if response[0] == ">" && prompt_count == 0
-            #   prompt_count = prompt_count + 1
-            #   lines << TFClient::StringUtils.remove_terminal_control_chars(string: response).chomp
-            #   puts "received first prompt, removed ctl chars: '#{lines.last}'"
-            #   sleep(0.1)
-            #   next
-            # end
-
-            # binding.pry
             lines << response.chomp!
           end
         end
@@ -160,7 +174,6 @@ module TextFlight
         socket.close
       end
 
-
       lines.each do |line|
         puts "#{line}"
       end
@@ -169,8 +182,9 @@ module TextFlight
     def initialize(socket)
       @socket = socket
       TextFlight::CLI.handle_beginning_text(socket: @socket)
+      sleep(1.0)
       TextFlight::CLI.login(socket: @socket)
-      sleep(0.1)
+      sleep(1.0)
       TextFlight::CLI.enable_client_mode(socket: @socket)
       read_eval_print
     end
@@ -179,7 +193,6 @@ module TextFlight
       begin
         loop do
           command = Readline.readline("textflight > ", true)
-          binding.pry
           @socket.puts command
 
           response = TextFlight::CLI.read_response(socket: @socket)
