@@ -93,13 +93,6 @@ module TextFlight
               next
             end
 
-            if response[0] == ">"  && prompt_count == 1
-              prompt_count = prompt_count + 1
-              lines << TFClient::StringUtils.remove_terminal_control_chars(string: response).chomp
-              puts "received second prompt; breaking: '#{lines.last}'"
-              break
-            end
-
             if response[/Quest/]
               puts "received 'Quest' line - ignoring"
               next
@@ -127,10 +120,58 @@ module TextFlight
       end
     end
 
+    def self.enable_client_mode(socket:)
+      puts("=== ENABLE CLIENT MODE ===")
+      binding.pry
+      socket.puts("language client")
+
+      lines = []
+      #prompt_count = 0
+      begin
+        loop do
+          response = socket.gets
+
+          # nil means socket has set EOF
+          if response.nil?
+            raise "server set EOF"
+          end
+
+          if response.length != 0
+            if response[/Updated language.|Updated language./]
+              puts "received updated mode message; breaking '#{response}'"
+              break
+            end
+
+            # if response[0] == ">" && prompt_count == 0
+            #   prompt_count = prompt_count + 1
+            #   lines << TFClient::StringUtils.remove_terminal_control_chars(string: response).chomp
+            #   puts "received first prompt, removed ctl chars: '#{lines.last}'"
+            #   sleep(0.1)
+            #   next
+            # end
+
+            # binding.pry
+            lines << response.chomp!
+          end
+        end
+      rescue IOError => e
+        puts e.message
+        # e.backtrace
+        socket.close
+      end
+
+
+      lines.each do |line|
+        puts "#{line}"
+      end
+    end
+
     def initialize(socket)
       @socket = socket
       TextFlight::CLI.handle_beginning_text(socket: @socket)
       TextFlight::CLI.login(socket: @socket)
+      sleep(0.1)
+      TextFlight::CLI.enable_client_mode(socket: @socket)
       read_eval_print
     end
 
@@ -138,6 +179,7 @@ module TextFlight
       begin
         loop do
           command = Readline.readline("textflight > ", true)
+          binding.pry
           @socket.puts command
 
           response = TextFlight::CLI.read_response(socket: @socket)
