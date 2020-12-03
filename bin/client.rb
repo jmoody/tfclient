@@ -21,7 +21,7 @@ module TextFlight
       end
 
       buffer = ""
-      max_tries = 5
+      max_tries = 10
       tries = 1
       begin
         loop do
@@ -77,9 +77,12 @@ module TextFlight
     def self.login(socket:)
       puts("=== LOGIN ===")
       socket.puts("login abc 1234")
-      response = self.read_response(socket: socket)
-      response.each do |line|
-        puts "#{line}"
+      2.times do
+        response = self.read_response(socket: socket)
+        response.each do |line|
+          puts "#{line}"
+        end
+        sleep(0.5)
       end
     end
 
@@ -106,7 +109,8 @@ module TextFlight
       begin
         loop do
           command = Readline.readline("textflight > ", true)
-          @socket.puts command
+          parsed_command = TFClient::CommandParser.new(command: command).parse
+          @socket.puts parsed_command
 
           response = TextFlight::CLI.read_response(socket: @socket)
           TextFlight::CLI.parse_response(response: response)

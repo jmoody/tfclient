@@ -1,0 +1,17 @@
+Coordinates: {x},{y}|Coordinates: {x},{y}|x=0|y=0
+Brightness: {brightness}|Brightness: {brightness}|brightness=104
+Asteroids: {asteroid_type} (density: {asteroid_density})|Asteroids: {asteroid_type} (density: {asteroid_density})|asteroid_type=carbon|asteroid_density=3
+Links:|Links:
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=0|link_drag=170
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=1|link_drag=32
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=2|link_drag=51
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=4|link_drag=11
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=5|link_drag=32
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=6|link_drag=138
+[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=7|link_drag=6
+Planets:|Planets:
+[{index}] ({planet_type})|      [{index}] ({planet_type})|index=0|planet_type=GAS
+[{index}] ({planet_type})|      [{index}] ({planet_type})|index=1|planet_type=GAS
+[{index}] ({planet_type})|      [{index}] ({planet_type})|index=2|planet_type=GAS
+Structures:|Structures:
+{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=1|name=abc's Ship|sclass=AST
