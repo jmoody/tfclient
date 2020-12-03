@@ -122,5 +122,8 @@ end
 
 host = "localhost"
 port = 10000
-socket  = TCPSocket.new(host, port)
+tcp = TCPSocket.new(host, port)
+socket = OpenSSL::SSL::SSLSocket.new(tcp)
+socket.sync_close = true
+socket.connect
 TextFlight::CLI.new(socket)

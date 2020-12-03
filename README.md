@@ -61,6 +61,10 @@ $ bundle  exec spec/integration
 - [x] send 'language client'
 - [x] if we send commands too fast, the socket buffer fills and the server cannot respond
 - [x] we need a way of reading until there is no more output.  a non-blocking read on the socket
-- [ ] stand up OpenSSL server locally  
-- [ ] consolidate special case read_response methods into one method. WOOT!
-- [ ] add a logger
+- [x] stand up OpenSSL server locally
+- [x] consolidate special case read_response methods into one method. WOOT!
+- [ ] ask about WARNING:EOF occurred in violation of protocol (_ssl.c:1122) in IRC
+     * possibly set EOT `\004'`
+- [ ] document how to setup local SSL
+- [ ] submit changes to upstream server
+- [ ] add a logger to client
