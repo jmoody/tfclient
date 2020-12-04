@@ -1,6 +1,6 @@
-Coordinates: {x},{y}|Coordinates: {x},{y}|x=0|y=0
-Brightness: {brightness}|Brightness: {brightness}|brightness=104
-Asteroids: {asteroid_type} (density: {asteroid_density})|Asteroids: {asteroid_type} (density: {asteroid_density})|asteroid_type=carbon|asteroid_density=3
+Coordinates: {x},{y}|Koordinaten: {x},{y}|x=1|y=2
+Brightness: {brightness}|Helligkeit: {brightness}|brightness=104
+Asteroids: {asteroid_type} (density: {asteroid_density})|Ästeroiden: {asteroid_type} (density: {asteroid_density})|asteroid_type=carbon|asteroid_density=3
 Links:|Links:
 [{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=0|link_drag=170
 [{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=1|link_drag=32
