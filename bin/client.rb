@@ -45,7 +45,7 @@ module TextFlight
           response = TFClient::StringUtils.remove_color_control_chars(string: response)
           buffer = buffer + response
 
-          sleep(0.1)
+          sleep(0.5)
         end
       rescue StandardError, IOError => e
         message = <<~EOM
@@ -127,7 +127,11 @@ end
 host = "localhost"
 port = 10000
 tcp = TCPSocket.new(host, port)
-socket = OpenSSL::SSL::SSLSocket.new(tcp)
-socket.sync_close = true
-socket.connect
+
+socket = tcp
+if ARGV[0] != "--no-ssl"
+  socket = OpenSSL::SSL::SSLSocket.new(tcp)
+  socket.sync_close = true
+  socket.connect
+end
 TextFlight::CLI.new(socket)

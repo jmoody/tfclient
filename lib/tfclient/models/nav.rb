@@ -18,8 +18,8 @@ module TFClient
     # 3: 270 degrees, X=-1, Y=0 (west)
     # 4: 90 degrees, X=1, Y=0 (east)
     # 5: 225 degrees, X=-1, Y=1 (southwest)
-    # 6: 180 degrees, X=0, Y=-1 (south)
-    # 7: 135 degrees, X=1, Y=-1 (southeast)
+    # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
+    # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
 
     class Coordinate
       attr_reader :x, :y, :label, :translation

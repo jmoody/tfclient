@@ -36,6 +36,11 @@ class at Smith in 2001 was in Python...) or how to configure Python on macOS.
 # Run the server like this:
 $ cd testflight
 $ src/main.py
+
+# Connect to the server like this:
+
+$ socat readline tcp:leagueh.xyz:10000
+$ socat readline ssl:leagueh.xyz:10000
 ```
 
 I would like to make a Docker container to host the server...
