@@ -27,6 +27,10 @@ module TFClient
     end
 
     def parse
+      if @command == "quit" || @command == "exit"
+        return "exit"
+      end
+
       if @command.length < 3 && (direction = DIRECTION_MAP[@command.to_sym])
         "jump #{direction}"
       else

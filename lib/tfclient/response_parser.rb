@@ -4,9 +4,40 @@ module TFClient
 
     FIELD_DELIMITER = "|".freeze
 
+    def self.is_list_item?(line:)
+      if line && line.length != 0 && line.start_with?("\t")
+        true
+      else
+        false
+      end
+    end
+
+    def self.collect_list_items(lines:, start_index:)
+      items = []
+      index = start_index
+      loop do
+        line = lines[index]
+        if self.is_list_item?(line: line)
+          items << line.strip
+          index = index + 1
+        else
+          break
+        end
+      end
+      items
+    end
+
     def self.tokenize_line(line:)
-      tokens = line.strip.split(FIELD_DELIMITER)
-      tokens.map { |token| token.strip }
+      lines = line.split(FIELD_DELIMITER)
+      stripped = []
+      lines.each_with_index do |line, index|
+        if index == 0
+          stripped << line
+        else
+          stripped << line.strip
+        end
+      end
+      stripped
     end
 
     def self.label_and_translation(tokens:)
@@ -35,9 +66,10 @@ module TFClient
     def parse_nav(lines:)
       nav = lines.dup
       response = []
-      response << Coordinate.new(ResponseParser.tokenize_line(line: nav[0])).to_s
-      response << Brightness.new(ResponseParser.tokenize_line(line: nav[1])).to_s
-      response << Asteroids.new(ResponseParser.tokenize_line(line: nav[2])).to_s
+      response << Coordinate.new(tokens: ResponseParser.tokenize_line(line: nav[0])).to_s
+      response << Brightness.new(tokens: ResponseParser.tokenize_line(line: nav[1])).to_s
+      response << Asteroids.new(tokens: ResponseParser.tokenize_line(line: nav[2])).to_s
+      response << Links.new(lines: lines, links_index: 3)
     end
   end
 end

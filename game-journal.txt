@@ -54,5 +54,10 @@ Iron, Copper, Carbon
 
 
 ??? is a jump always reversable? can you always jump back to where you
-    jumped from?   
+    jumped from?
 
+# Supply Package for Distribution Center
+O  256
+H  448
+C  64
+Fe 16

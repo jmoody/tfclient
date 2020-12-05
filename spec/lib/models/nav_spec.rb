@@ -46,5 +46,20 @@ RSpec.describe TFClient::Models do
       expect(actual.to_s).to be == "Ästeroiden: carbon (3) => 43%"
     end
   end
+
+  context "Links" do
+    it ".new can return a valid object from lines and a links index" do
+      actual = TFClient::Models::Links.new(lines: lines, links_index: 3)
+      expect(actual.label).to be == "Links"
+      expect(actual.translation).to be == "Ausfahrten"
+      expect(actual.links.length).to be == 3
+      expect(actual.links[0][:drag]).to be == 170
+      expect(actual.links[0][:index]).to be == 0
+      expect(actual.links[1][:drag]).to be == 32
+      expect(actual.links[1][:index]).to be == 4
+      expect(actual.links[2][:drag]).to be == 51
+      expect(actual.links[2][:index]).to be == 7
+    end
+  end
 end
 
