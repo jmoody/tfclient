@@ -1,0 +1,58 @@
+
+
+37,44 Carbon 7 B: 227
+39,26 Uranium 7, B: 181 Barren, Greenhouse, Gas
+37,27 Iron 6, B 113 Greenhouse, Barren
+31,28 Carbon 7, B: 152
+26,28 Iron 7, B 168, Gas
+22,27 Silicon 6, B 184
+ 9,23 Copper 7, B 96
+
+Nibiru
+11,20 Iron 0, B 175 Habitable!!!
+22,09 carbon 7, B 107 Gas Gas
+
+10,19 U 2, B 36 - Gas
+11,19 Cu 4, B 140 - Gas, Barren - Gas 1920.0 second mining interval.
+12,19 Si 5, B 204 - Frozen, Gas, Gas
+10,20 Fe 5, B 152 - None
+12,20 Fe 1, B 53 - None
+10,21 Si 2, B 201 - None
+12,21 C 2, B 140 - None
+12,22 C 5, B 11 - None
+11,23 U 6, B 63 - 0 Barren
+18,16 Si 7, B 9 - Barren, Frozen
+18,15 Cu 6, B 50 - Greenhouse, Gas, Barren
+
+
+
+07,20 U 5, B 88 Greenhouse, Greenhouse
+03,16 C 7, B 14 None
+04,17 Si 7, B 185 Gas Greenhouse
+06,18 C 6, B 111 None
+07,19 U 6, B 208 Gas, Gas, Gas
+08,19 U 6, B 157 None
+
+23,8 rhaikh Rapmaster Eleven SAT
+
+Iron, Copper, Carbon
+
+
+// prompt shows status
+   H: 0/60 (-1.0) E: 60/60 (-1.0) W: 89% tf>
+   H: Overheat    E: Brownout     W: off tf>
+// jump when ready
+// show nav after jump
+// breadcrumbs - know where you came from
+// explored - what have you seen
+// maps of
+   * neighboring systems
+// show queue
+// power down
+// power up
+// nav to X,Y - find a path
+
+
+??? is a jump always reversable? can you always jump back to where you
+    jumped from?   
+
