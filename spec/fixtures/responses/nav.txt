@@ -7,7 +7,7 @@ Links:|Ausfahrten:
 	[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=7|link_drag=51
 Planets:|Planeten:
 	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=0|planet_type=GAS
-	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=1|planet_type=GAS
-	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=2|planet_type=GAS
+	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=1|planet_type=Frozen
+	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=2|planet_type=Barren
 Structures:|Strukturen:
 	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=1|name=abc's Ship|sclass=AST

@@ -79,6 +79,7 @@ module TFClient
     class Links < Model
 
       attr_reader :links
+
       def initialize(lines:, links_index:)
         tokens = ResponseParser.tokenize_line(line: lines[links_index])
         hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
@@ -100,6 +101,29 @@ module TFClient
 
       def to_s
         "#{@translation}: #{@links.map {|link| link[:string]}}"
+      end
+    end
+
+    class Planets < Model
+      attr_reader :planets
+
+      def initialize(lines:, links_index:)
+        tokens = ResponseParser.tokenize_line(line: lines[links_index])
+        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
+        super(label: hash[:label], translation: hash[:translation] )
+
+        items = ResponseParser.collect_list_items(lines: lines, start_index: links_index + 1)
+        @planets = items.map do |item|
+          tokens = ResponseParser.tokenize_line(line: item.strip)
+          index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
+          type = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
+          { index: index, type: type,
+            string: %Q[[#{index}] #{type}]
+          }
+        end
+        def to_s
+          "#{@translation}: #{@planets.map {|planet| planet[:string]}}"
+        end
       end
     end
   end

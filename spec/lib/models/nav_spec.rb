@@ -61,5 +61,20 @@ RSpec.describe TFClient::Models do
       expect(actual.links[2][:index]).to be == 7
     end
   end
+
+  context "Planets" do
+    it ".new can return a valid object from lines and a links index" do
+      actual = TFClient::Models::Planets.new(lines: lines, links_index: 7)
+      expect(actual.label).to be == "Planets"
+      expect(actual.translation).to be == "Planeten"
+      expect(actual.planets.length).to be == 3
+      expect(actual.planets[0][:index]).to be == 0
+      expect(actual.planets[0][:type]).to be == "GAS"
+      expect(actual.planets[1][:index]).to be == 1
+      expect(actual.planets[1][:type]).to be == "Frozen"
+      expect(actual.planets[2][:index]).to be == 2
+      expect(actual.planets[2][:type]).to be == "Barren"
+    end
+  end
 end
 
