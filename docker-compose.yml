@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  tcp:
+  ssl:
     build: .
     ports:
       - "10000:10000"

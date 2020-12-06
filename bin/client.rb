@@ -128,26 +128,31 @@ module TextFlight
       end
     end
 
-    attr_reader :socket, :user, :pass, :host, :port, :ssl
+    attr_reader :socket, :user, :pass, :host, :port, :ssl, :state, :dev
 
-    def initialize(host:, port:, ssl:, user:, pass:)
+    def initialize(host:, port:, ssl:, user:, pass:, dev:)
+      @state = { }
       @user = user
       @pass = pass
       @host = host
       @port = port
       @ssl = ssl
-      @socket = connect(host: @host, port: @port, ssl: @ssl)
-      TextFlight::CLI.read_response(socket: @socket)
-      TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
-      TextFlight::CLI.enable_client_mode(socket: @socket)
+      @socket = connect(host: @host, port: @port, ssl: @ssl, dev: dev)
+      #TextFlight::CLI.read_response(socket: @socket)
+      #TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
+      #TextFlight::CLI.enable_client_mode(socket: @socket)
       read_eval_print
     end
 
-    def connect(host:, port:, ssl:)
+    def connect(host:, port:, ssl:, dev:)
       puts "try to connect to #{host}:#{port} with ssl = #{ssl}"
       if ssl
-        tcp = TCPSocket.new(ENV["TF_HOST"], ENV["TF_PORT"])
-        socket = OpenSSL::SSL::SSLSocket.new(tcp)
+        ssl_context = OpenSSL::SSL::SSLContext.new
+        if dev
+          ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        tcp_socket = TCPSocket.new(ENV["TF_HOST"], ENV["TF_PORT"])
+        socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
         socket.sync_close = true
         socket.connect
       else
@@ -159,9 +164,8 @@ module TextFlight
     def read_eval_print
       begin
         loop do
-          command = Readline.readline("textflight > ", true)
+          command = Readline.readline("tf > ", true)
           parsed_command = TFClient::CommandParser.new(command: command).parse
-          TextFlight::CLI.write_command(socket: socket, command: parsed_command)
 
           if parsed_command == "exit"
             TextFlight::CLI.write_command(socket: socket, command: parsed_command)
@@ -169,6 +173,8 @@ module TextFlight
             puts "Goodbye."
             exit(0)
           end
+
+          TextFlight::CLI.write_command(socket: socket, command: parsed_command)
 
           response = TextFlight::CLI.read_response(socket: @socket)
           TextFlight::CLI.parse_response(response: response)
@@ -192,4 +198,4 @@ port = ENV["#{env}_PORT"]
 user = ENV["#{env}_USER"]
 pass = ENV["#{env}_PASS"]
 
-TextFlight::CLI.new(host: host, port: port, ssl: ssl, user: user, pass: pass)
+TextFlight::CLI.new(host: host, port: port, ssl: ssl, user: user, pass: pass, dev: env == "DEV")

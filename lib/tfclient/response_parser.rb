@@ -57,7 +57,7 @@ module TFClient
     end
 
     def parse
-      @lines = response.lines(chomp: true).reject { |line| line.length == 0 }
+      @lines = @response.lines(chomp: true).reject { |line| line.length == 0 }
       case command
       when "nav"
         return parse_nav
