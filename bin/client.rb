@@ -101,6 +101,19 @@ module TextFlight
       end
     end
 
+    def self.register(socket:, user:, pass:)
+      puts("=== REGISTER ===")
+      puts("user: #{user} pass: #{pass[0..3]}***")
+      sleep(0.5)
+      self.write_command(socket: socket, command: "register #{user} #{pass}")
+
+      response = self.read_response(socket: socket)
+      response.each do |line|
+        puts "#{line}"
+      end
+
+    end
+
     def self.login(socket:, user:, pass:)
       puts("=== LOGIN ===")
       puts("user: #{user} pass: #{pass[0..3]}***")
@@ -113,6 +126,7 @@ module TextFlight
         socket.close
         exit(1)
       end
+
       response.each do |line|
         puts "#{line}"
       end
@@ -138,9 +152,10 @@ module TextFlight
       @port = port
       @ssl = ssl
       @socket = connect(host: @host, port: @port, ssl: @ssl, dev: dev)
-      #TextFlight::CLI.read_response(socket: @socket)
-      #TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
-      #TextFlight::CLI.enable_client_mode(socket: @socket)
+      TextFlight::CLI.read_response(socket: @socket)
+      TextFlight::CLI.register(socket: @socket, user: @user, pass: @pass)
+      TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
+      TextFlight::CLI.enable_client_mode(socket: @socket)
       read_eval_print
     end
 
@@ -193,9 +208,9 @@ require "tfclient"
 
 env = ARGV.include?("--dev") ? "DEV" : "TF"
 ssl = ARGV.include?("--ssl")
-host = ENV["#{env}_HOST"]
-port = ENV["#{env}_PORT"]
-user = ENV["#{env}_USER"]
-pass = ENV["#{env}_PASS"]
+host = ENV["#{env}_HOST"] || "localhost"
+port = ENV["#{env}_PORT"] || "10000"
+user = ENV["#{env}_USER"] || "abc"
+pass = ENV["#{env}_PASS"] || "1234"
 
 TextFlight::CLI.new(host: host, port: port, ssl: ssl, user: user, pass: pass, dev: env == "DEV")

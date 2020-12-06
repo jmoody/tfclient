@@ -24,9 +24,10 @@ RUN openssl \
       -days 365 \
       -nodes \
       -subj "/C=DE/ST=BW/L=Konstanz/O=nibiru/OU=Org/CN=localhost"
-RUN sed -i "s/SSL = false/SSL = true/" textflight.conf
-RUN sed -i "s/SSLCert =/SSLCert = certs/cert.pem/" textflight.conf
-RUN sed -i "s/SSLKey =/SSLKey = certs/cert.pem/" textflight.conf
+RUN sed -i -e "s/SSL = false/SSL = true/" textflight.conf
+RUN sed -i -e "s/SSLCert =/SSLCert = certs\/cert.pem/" textflight.conf
+RUN sed -i -e "s/SSLKey =/SSLKey = certs\/key.pem/" textflight.conf
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 RUN cat textflight.conf
 
 CMD ["src/main.py"]
