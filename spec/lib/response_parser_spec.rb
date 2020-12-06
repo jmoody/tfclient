@@ -2,8 +2,8 @@
 RSpec.describe TFClient::ResponseParser do
 
   let(:fixtures_dir) { File.join("spec", "fixtures", "responses") }
-  let(:scan_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
-  let(:lines) { scan_response.lines }
+  let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
+  let(:lines) { nav_response.lines }
 
   context ".is_list_item?" do
     it "returns true when line begins with a tab char" do
@@ -59,6 +59,14 @@ RSpec.describe TFClient::ResponseParser do
 
       actual = described_class.nth_value_from_end(tokens: tokens, n: 1)
       expect(actual).to be == "1"
+    end
+  end
+
+  context "#parse_nav" do
+    it "returns a string that is ready to be printed" do
+      hash = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
+
+      puts hash[:response]
     end
   end
 

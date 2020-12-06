@@ -10,4 +10,6 @@ Planets:|Planeten:
 	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=1|planet_type=Frozen
 	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=2|planet_type=Barren
 Structures:|Strukturen:
-	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=1|name=abc's Ship|sclass=AST
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=123|name=abc's Ship|sclass=AST
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=456|name=Moonlight on Window|sclass=GAX
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=789|name=Consider Phlebus|sclass=SAT

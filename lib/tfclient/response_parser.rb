@@ -50,26 +50,44 @@ module TFClient
 
     attr_reader :command
     attr_reader :response
+    attr_reader :lines
     def initialize(command:, response:)
       @command = command
       @response = response
     end
 
     def parse
-      lines = response.lines(chomp: true).reject { |line| line.length == 0 }
+      @lines = response.lines(chomp: true).reject { |line| line.length == 0 }
       case command
       when "nav"
-        parse_nav(lines)
+        return parse_nav
+        else
+          return lines.join("\n")
       end
     end
 
-    def parse_nav(lines:)
-      nav = lines.dup
+    def parse_nav
+      hash = {
+        coordinate: Models::Coordinate.new(tokens: ResponseParser.tokenize_line(line: @lines[0])),
+        brightness: Models::Brightness.new(tokens: ResponseParser.tokenize_line(line: @lines[1])),
+        asteroids: Models::Asteroids.new(tokens: ResponseParser.tokenize_line(line: @lines[2]))
+      }
+      hash[:links] = Models::Links.new(lines: @lines, start_index: 3)
+      hash[:planets] = Models::Planets.new(lines: @lines, start_index: hash[:links].lines_offset + 3)
+      hash[:structures] = Models::Structures.new(lines: @lines,
+                                                 start_index: 3 +
+                                                   hash[:links].lines_offset +
+                                                   hash[:planets].lines_offset )
       response = []
-      response << Coordinate.new(tokens: ResponseParser.tokenize_line(line: nav[0])).to_s
-      response << Brightness.new(tokens: ResponseParser.tokenize_line(line: nav[1])).to_s
-      response << Asteroids.new(tokens: ResponseParser.tokenize_line(line: nav[2])).to_s
-      response << Links.new(lines: lines, links_index: 3)
+      response << hash[:coordinate].to_s
+      response << hash[:brightness].to_s
+      response << hash[:asteroids].to_s
+      response << hash[:links].response_str
+      response << hash[:planets].response_str
+      response << hash[:structures].response_str
+
+      hash[:response] = response.join("\n")
+      hash
     end
   end
 end

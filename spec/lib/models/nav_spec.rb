@@ -49,32 +49,52 @@ RSpec.describe TFClient::Models do
 
   context "Links" do
     it ".new can return a valid object from lines and a links index" do
-      actual = TFClient::Models::Links.new(lines: lines, links_index: 3)
+      actual = TFClient::Models::Links.new(lines: lines, start_index: 3)
       expect(actual.label).to be == "Links"
       expect(actual.translation).to be == "Ausfahrten"
-      expect(actual.links.length).to be == 3
-      expect(actual.links[0][:drag]).to be == 170
-      expect(actual.links[0][:index]).to be == 0
-      expect(actual.links[1][:drag]).to be == 32
-      expect(actual.links[1][:index]).to be == 4
-      expect(actual.links[2][:drag]).to be == 51
-      expect(actual.links[2][:index]).to be == 7
+      expect(actual.count).to be == 3
+      expect(actual.items[0][:drag]).to be == 170
+      expect(actual.items[0][:index]).to be == 0
+      expect(actual.items[1][:drag]).to be == 32
+      expect(actual.items[1][:index]).to be == 4
+      expect(actual.items[2][:drag]).to be == 51
+      expect(actual.items[2][:index]).to be == 7
+      puts actual
     end
   end
 
   context "Planets" do
     it ".new can return a valid object from lines and a links index" do
-      actual = TFClient::Models::Planets.new(lines: lines, links_index: 7)
+      actual = TFClient::Models::Planets.new(lines: lines, start_index: 7)
       expect(actual.label).to be == "Planets"
       expect(actual.translation).to be == "Planeten"
-      expect(actual.planets.length).to be == 3
-      expect(actual.planets[0][:index]).to be == 0
-      expect(actual.planets[0][:type]).to be == "GAS"
-      expect(actual.planets[1][:index]).to be == 1
-      expect(actual.planets[1][:type]).to be == "Frozen"
-      expect(actual.planets[2][:index]).to be == 2
-      expect(actual.planets[2][:type]).to be == "Barren"
+      expect(actual.count).to be == 3
+      expect(actual.items[0][:index]).to be == 0
+      expect(actual.items[0][:type]).to be == "GAS"
+      expect(actual.items[1][:index]).to be == 1
+      expect(actual.items[1][:type]).to be == "Frozen"
+      expect(actual.items[2][:index]).to be == 2
+      expect(actual.items[2][:type]).to be == "Barren"
+      puts actual
+    end
+  end
+
+  context "Structures" do
+    it ".new can return a valid object from lines and a links index" do
+      actual = TFClient::Models::Structures.new(lines: lines, start_index: 11)
+      expect(actual.label).to be == "Structures"
+      expect(actual.translation).to be == "Strukturen"
+      expect(actual.count).to be == 3
+      expect(actual.items[0][:id]).to be == 123
+      expect(actual.items[0][:name]).to be == "abc's Ship"
+      expect(actual.items[0][:sclass]).to be == "AST"
+      expect(actual.items[1][:id]).to be == 456
+      expect(actual.items[1][:name]).to be == "Moonlight on Window"
+      expect(actual.items[1][:sclass]).to be == "GAX"
+      expect(actual.items[2][:id]).to be == 789
+      expect(actual.items[2][:name]).to be == "Consider Phlebus"
+      expect(actual.items[2][:sclass]).to be == "SAT"
+      puts actual
     end
   end
 end
-

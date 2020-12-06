@@ -76,17 +76,39 @@ module TFClient
       end
     end
 
-    class Links < Model
+    class ModelWithItems < Model
+      attr_reader :items
 
-      attr_reader :links
+      def count
+        @items.count
+      end
 
-      def initialize(lines:, links_index:)
-        tokens = ResponseParser.tokenize_line(line: lines[links_index])
+      def to_s
+        "#{@translation}: #{@items.map { |item| item[:string]}}"
+      end
+
+      def items_to_s
+        @items.map { |item| "\t#{item[:string]}" }
+      end
+
+      def response_str
+        "#{@translation}:\n#{items_to_s.join("\n")}"
+      end
+
+      def lines_offset
+        @items.length + 1
+      end
+    end
+
+    class Links < ModelWithItems
+
+      def initialize(lines:, start_index:)
+        tokens = ResponseParser.tokenize_line(line: lines[start_index])
         hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
         super(label: hash[:label], translation: hash[:translation] )
 
-        items = ResponseParser.collect_list_items(lines: lines, start_index: links_index + 1)
-        @links = items.map do |item|
+        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+        @items = items.map do |item|
           tokens = ResponseParser.tokenize_line(line: item.strip)
           index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
           drag = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
@@ -98,31 +120,39 @@ module TFClient
           }
         end
       end
-
-      def to_s
-        "#{@translation}: #{@links.map {|link| link[:string]}}"
-      end
     end
 
-    class Planets < Model
-      attr_reader :planets
+    class Planets < ModelWithItems
 
-      def initialize(lines:, links_index:)
-        tokens = ResponseParser.tokenize_line(line: lines[links_index])
+      def initialize(lines:, start_index:)
+        tokens = ResponseParser.tokenize_line(line: lines[start_index])
         hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
         super(label: hash[:label], translation: hash[:translation] )
 
-        items = ResponseParser.collect_list_items(lines: lines, start_index: links_index + 1)
-        @planets = items.map do |item|
+        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+        @items = items.map do |item|
           tokens = ResponseParser.tokenize_line(line: item.strip)
           index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
           type = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
-          { index: index, type: type,
-            string: %Q[[#{index}] #{type}]
-          }
+          { index: index, type: type, string: %Q[[#{index}] #{type}] }
         end
-        def to_s
-          "#{@translation}: #{@planets.map {|planet| planet[:string]}}"
+      end
+    end
+
+    class Structures < ModelWithItems
+
+      def initialize(lines:, start_index:)
+        tokens = ResponseParser.tokenize_line(line: lines[start_index])
+        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
+        super(label: hash[:label], translation: hash[:translation] )
+
+        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+        @items = items.map do |item|
+          tokens = ResponseParser.tokenize_line(line: item.strip)
+          id = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 2).to_i
+          name = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1)
+          sclass = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
+          { id: id, name: name, sclass: sclass, string: %Q[[#{id}] #{name} [#{sclass}]]  }
         end
       end
     end
