@@ -4,6 +4,23 @@ module TFClient
 
     FIELD_DELIMITER = "|".freeze
 
+    def self.hash_with_values(line:)
+      tokens = self.tokenize_line(line: line)[2..-1]
+      hash = {}
+      tokens.each do |token|
+        key_value = token.split("=")
+        hash[key_value[0].to_sym] = key_value[1]
+      end
+      hash
+    end
+
+    def self.index_of_label(lines:, label:)
+      lines.each_with_index do |line, index|
+        return index if line[/#{label}/]
+      end
+      nil
+    end
+
     def self.is_list_item?(line:)
       if line && line.length != 0 && line.start_with?("\t")
         true
@@ -41,7 +58,11 @@ module TFClient
     end
 
     def self.label_and_translation(tokens:)
-      {label: tokens[0].split(":")[0], translation: tokens[1].split(":")[0] }
+      if tokens[0][/Claimed by/]
+        {label: "Claimed by", translation: tokens[1].split("'")[0].strip}
+      else
+        {label: tokens[0].split(":")[0], translation: tokens[1].split(":")[0] }
+      end
     end
 
     def self.nth_value_from_end(tokens:, n:)

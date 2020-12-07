@@ -21,11 +21,22 @@ module TFClient
     # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
     # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
 
-    class Model
-      attr_accessor :label, :translation
-      def initialize(label:, translation:)
-        @label = label
-        @translation = translation
+    LABELS = [
+      "Coordinates",
+      "Claimed by",
+      "Asteroids",
+      "Links",
+      "Planets",
+      "Structures"
+    ]
+
+    class Nav
+
+      attr_reader :coordinates, :claimed_by, :brightness, :asteroids
+      attr_reader :links, :planets, :structures
+
+      def initialize(lines:)
+
       end
     end
 
@@ -35,12 +46,26 @@ module TFClient
       def initialize(tokens:)
         hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
         super(label: hash[:label], translation: hash[:translation] )
-        @x = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
+        hash = TFClient::ResponseParser.hash_with_values()
         @y = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
       end
 
       def to_s
-        %Q[#{@translation}: #{@x},#{@y}]
+        %Q[#{@translation}: (#{@x},#{@y})]
+      end
+    end
+
+    class ClaimedBy < Model
+      attr_reader :faction
+
+      def initialize(tokens:)
+        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
+        super(label: hash[:label], translation: hash[:translation] )
+        @faction = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
+      end
+
+      def to_s
+        %Q[#{@translation}: '#{@faction}']
       end
     end
 
@@ -76,30 +101,6 @@ module TFClient
       end
     end
 
-    class ModelWithItems < Model
-      attr_reader :items
-
-      def count
-        @items.count
-      end
-
-      def to_s
-        "#{@translation}: #{@items.map { |item| item[:string]}}"
-      end
-
-      def items_to_s
-        @items.map { |item| "\t#{item[:string]}" }
-      end
-
-      def response_str
-        "#{@translation}:\n#{items_to_s.join("\n")}"
-      end
-
-      def lines_offset
-        @items.length + 1
-      end
-    end
-
     class Links < ModelWithItems
 
       def initialize(lines:, start_index:)
@@ -110,6 +111,7 @@ module TFClient
         items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
         @items = items.map do |item|
           tokens = ResponseParser.tokenize_line(line: item.strip)
+
           index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
           drag = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
           # direction is WIP

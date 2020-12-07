@@ -4,6 +4,9 @@ RSpec.describe TFClient::Models do
   let(:scan_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
   let(:lines) { scan_response.lines(chomp: true)}
 
+  context "Nav" do
+  end
+
   context "Coordinate" do
     it ".new can return a valid object from a array of tokens" do
       tokens = TFClient::ResponseParser.tokenize_line(line: lines[0])
@@ -13,14 +16,26 @@ RSpec.describe TFClient::Models do
       expect(actual.x).to be == 1
       expect(actual.y).to be == 2
 
-      expect(actual.to_s).to be == "Koordinaten: 1,2"
+      expect(actual.to_s).to be == "Koordinaten: (1,2)"
+    end
+  end
+
+  context "ClaimedBy" do
+    it ".new can return a valid object from a array of tokens" do
+      tokens = TFClient::ResponseParser.tokenize_line(line: lines[1])
+      actual = TFClient::Models::ClaimedBy.new(tokens: tokens)
+      expect(actual.label).to be == "Claimed by"
+      expect(actual.translation).to be == "Beansprucht von"
+      expect(actual.faction).to be == "nibiru"
+
+      expect(actual.to_s).to be == "Beansprucht von 'nibiru'"
     end
   end
 
   context "Brightness" do
     it ".new can return a valid object from a array of tokens" do
       # Brightness: {brightness}|Helligkeit: {brightness}|brightness=104
-      tokens = TFClient::ResponseParser.tokenize_line(line: lines[1])
+      tokens = TFClient::ResponseParser.tokenize_line(line: lines[2])
       actual = TFClient::Models::Brightness.new(tokens: tokens)
       expect(actual.label).to be == "Brightness"
       expect(actual.translation).to be == "Helligkeit"
@@ -36,7 +51,7 @@ RSpec.describe TFClient::Models do
       # Asteroids: {asteroid_type} (density: {asteroid_density})|\
       # Ästeroiden: {asteroid_type} (density: {asteroid_density})|\
       # asteroid_type=carbon|asteroid_density=3
-      tokens = TFClient::ResponseParser.tokenize_line(line: lines[2])
+      tokens = TFClient::ResponseParser.tokenize_line(line: lines[3])
       actual = TFClient::Models::Asteroids.new(tokens: tokens)
       expect(actual.label).to be == "Asteroids"
       expect(actual.translation).to be == "Ästeroiden"
@@ -49,10 +64,10 @@ RSpec.describe TFClient::Models do
 
   context "Links" do
     it ".new can return a valid object from lines and a links index" do
-      actual = TFClient::Models::Links.new(lines: lines, start_index: 3)
+      actual = TFClient::Models::Links.new(lines: lines, start_index: 4)
       expect(actual.label).to be == "Links"
       expect(actual.translation).to be == "Ausfahrten"
-      expect(actual.count).to be == 3
+      expect(actual.count).to be == 5
       expect(actual.items[0][:drag]).to be == 170
       expect(actual.items[0][:index]).to be == 0
       expect(actual.items[1][:drag]).to be == 32
@@ -65,7 +80,7 @@ RSpec.describe TFClient::Models do
 
   context "Planets" do
     it ".new can return a valid object from lines and a links index" do
-      actual = TFClient::Models::Planets.new(lines: lines, start_index: 7)
+      actual = TFClient::Models::Planets.new(lines: lines, start_index: 9)
       expect(actual.label).to be == "Planets"
       expect(actual.translation).to be == "Planeten"
       expect(actual.count).to be == 3
@@ -81,7 +96,7 @@ RSpec.describe TFClient::Models do
 
   context "Structures" do
     it ".new can return a valid object from lines and a links index" do
-      actual = TFClient::Models::Structures.new(lines: lines, start_index: 11)
+      actual = TFClient::Models::Structures.new(lines: lines, start_index: 13)
       expect(actual.label).to be == "Structures"
       expect(actual.translation).to be == "Strukturen"
       expect(actual.count).to be == 3

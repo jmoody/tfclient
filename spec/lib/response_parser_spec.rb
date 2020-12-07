@@ -5,6 +5,54 @@ RSpec.describe TFClient::ResponseParser do
   let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
   let(:lines) { nav_response.lines }
 
+  context ".hash_with_values" do
+    it "returns a hash with the key=value pairs at the end of a line" do
+      actual = described_class.hash_with_values(line: lines[0])
+      expect(actual).to be == {x: "1", y: "2"}
+
+      actual = described_class.hash_with_values(line: lines[1])
+      expect(actual).to be == {faction: "nibiru"}
+
+      actual = described_class.hash_with_values(line: lines[6])
+      expect(actual).to be == {index: "4", link_drag: "32"}
+
+      actual = described_class.hash_with_values(line: lines[7])
+      expect(actual).to be == {index: "5", faction: "nibiru", link_drag: "90"}
+
+      actual = described_class.hash_with_values(line: lines[10])
+      expect(actual).to be == {index: "0", planet_type: "GAS"}
+
+      actual = described_class.hash_with_values(line: lines[12])
+      expect(actual).to be == {
+        index: "6", name: "notwendig", faction: "nibiru", planet_type: "Habitable"
+      }
+
+      actual = described_class.hash_with_values(line: lines[15])
+      expect(actual).to be == {id: "123", name: "abc's Ship", sclass: "AST"}
+
+      actual = described_class.hash_with_values(line: lines[18])
+      expect(actual).to be == {id: "360", name: "hafen-9"}
+    end
+  end
+
+  context ".index_of_label" do
+    it "returns the index of the line that begins with label" do
+      actual = described_class.index_of_label(lines: lines, label: "Coordinates")
+      expect(actual).to be == 0
+
+      actual = described_class.index_of_label(lines: lines, label: "Links")
+      expect(actual).to be == 5
+
+      actual = described_class.index_of_label(lines: lines, label: "Structures")
+      expect(actual).to be == 14
+    end
+
+    it "returns nil there is no line that begins with label" do
+      actual = described_class.index_of_label(lines: lines, label: "Lumen")
+      expect(actual).to be == nil
+    end
+  end
+
   context ".is_list_item?" do
     it "returns true when line begins with a tab char" do
       expect(described_class.is_list_item?(line: "\thello,abc")).to be == true
@@ -45,6 +93,15 @@ RSpec.describe TFClient::ResponseParser do
 
       actual = described_class.label_and_translation(tokens: tokens)
       expected = { label: "Coordinates", translation: "Ordinates" }
+      expect(actual).to be == expected
+    end
+
+    it "returns a hash with label: and translation: from a 'Claimed by' line" do
+      line = "Claimed by '{faction}'.|Beansprucht von '{faction}'.|faction=nibiru"
+      tokens = described_class.tokenize_line(line: line)
+
+      actual = described_class.label_and_translation(tokens: tokens)
+      expected = { label: "Claimed by", translation: "Beansprucht von"}
       expect(actual).to be == expected
     end
   end
