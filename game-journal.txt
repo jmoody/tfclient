@@ -15,7 +15,9 @@ Nibiru
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren - Gas 1920.0 second mining interval.
 12,19 Si 5, B 204 - Frozen, Gas, Gas
+12,18 C 4, B 207 - Barren, Gas
 10,20 Fe 5, B 152 - None
+11,21 Fe 4, B 93 - None
 12,20 Fe 1, B 53 - None
 10,21 Si 2, B 201 - None
 12,21 C 2, B 140 - None

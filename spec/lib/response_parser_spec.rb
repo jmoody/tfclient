@@ -35,6 +35,16 @@ RSpec.describe TFClient::ResponseParser do
     end
   end
 
+  context ".line_for_label" do
+    it "returns the line that begins with label"
+    it "returns nil if no line begins with label"
+  end
+
+  context ".tokens_for_label" do
+    it "returns the line that begins with label, tokenized"
+    it "returns nil if not line begins with label"
+  end
+
   context ".index_of_label" do
     it "returns the index of the line that begins with label" do
       actual = described_class.index_of_label(lines: lines, label: "Coordinates")

@@ -36,7 +36,8 @@ module TFClient
       attr_reader :links, :planets, :structures
 
       def initialize(lines:)
-
+        coordinate_line = ResponseParser.index_of_label(lines: lines, label: "Coordinates")
+        @coordinates = Coordinate.new(tokens: ResponseParser.tokenize_line(lines[coordinate_line]))
       end
     end
 
@@ -46,7 +47,7 @@ module TFClient
       def initialize(tokens:)
         hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
         super(label: hash[:label], translation: hash[:translation] )
-        hash = TFClient::ResponseParser.hash_with_values()
+        @x = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
         @y = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
       end
 
