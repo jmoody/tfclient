@@ -7,10 +7,11 @@
 26,28 Iron 7, B 168, Gas
 22,27 Silicon 6, B 184
  9,23 Copper 7, B 96
+22,09 carbon 7, B 107 Gas Gas
 
 Nibiru
 11,20 Iron 0, B 175 Habitable!!!
-22,09 carbon 7, B 107 Gas Gas
+
 
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren - Gas 1920.0 second mining interval.
@@ -63,3 +64,27 @@ O  256
 H  448
 C  64
 Fe 16
+
+Supply Package 1
+O 16 + 16 + 16                  = 48   768
+H 32 + (2 * 16) + 16 + (2 * 16) = 112  1792
+C 16                            = 16   256
+Fe 16                           = 16   256
+
+H20 64 + 16 + 16 = 96
+
+Shipyard
+
+Iron = 320
+Carbon = 320
+
+- [x] Controller 2
+- [ ] Light Material 4
+  - [ ] Carbon Alloy 4
+     - [ ] Iron 4      => 16 => 64
+     - [ ] Carbon 4    => 16 => 64
+- [ ] Heavy Plating 4
+  - [ ] Carbon Alloy 16
+     - [ ] Iron 4      => 64 => 256
+     - [ ] Carbon 4    => 64 => 256
+  - [x] Thermal Pipe

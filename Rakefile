@@ -18,3 +18,8 @@ RSpec::Core::RakeTask.new(:integration) do |task|
   Rake::Task["bundle:audit"].invoke
   task.pattern = "spec/integration/**{,/*/**}/*_spec.rb"
 end
+
+task :server do
+  sh "docker-compose up --build --remove-orphans"
+end
+
