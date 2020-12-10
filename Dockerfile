@@ -12,7 +12,7 @@ RUN pip3 install bcrypt
 ENV PYTHONUNBUFFERED 1
 
 EXPOSE 10000
-RUN git clone https://leagueh.xyz/git/textflight/.git/ textflight
+RUN git clone -b feature/unset-client-mode https://github.com/jmoody/textflight.git textflight
 WORKDIR /textflight
 RUN cp textflight.conf.example textflight.conf
 RUN mkdir -p certs
