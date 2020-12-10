@@ -4,7 +4,41 @@ module TFClient
 
     FIELD_DELIMITER = "|".freeze
 
-    def self.hash_with_values(line:)
+    def self.tokenize_line(line:)
+      lines = line.split(FIELD_DELIMITER)
+      stripped = []
+      lines.each_with_index do |line, index|
+        if index == 0
+          stripped << line
+        else
+          stripped << line.strip
+        end
+      end
+      stripped
+    end
+
+    # returns two values
+    # TODO unused?
+    def self.tokens_and_index_for_label(lines:, label:)
+      lines.each_with_index do |line, index|
+        if line.start_with?(label)
+          return self.tokenize_line(line: line.chomp), index
+        end
+      end
+      return nil, -1
+    end
+
+    # returns two values
+    def self.line_and_index_for_label(lines:, label:)
+      lines.each_with_index do |line, index|
+        return line.chomp, index if line[/#{label}/]
+      end
+      return nil, -1
+    end
+
+
+    # Returns a hash of the key=value pairs found at the end of lines
+    def self.hash_from_line_values(line:)
       tokens = self.tokenize_line(line: line)[2..-1]
       hash = {}
       tokens.each do |token|
@@ -14,6 +48,7 @@ module TFClient
       hash
     end
 
+    # TODO needed?
     def self.index_of_label(lines:, label:)
       lines.each_with_index do |line, index|
         return index if line[/#{label}/]
@@ -44,18 +79,6 @@ module TFClient
       items
     end
 
-    def self.tokenize_line(line:)
-      lines = line.split(FIELD_DELIMITER)
-      stripped = []
-      lines.each_with_index do |line, index|
-        if index == 0
-          stripped << line
-        else
-          stripped << line.strip
-        end
-      end
-      stripped
-    end
 
     def self.label_and_translation(tokens:)
       if tokens[0][/Claimed by/]
@@ -67,6 +90,16 @@ module TFClient
 
     def self.nth_value_from_end(tokens:, n:)
       tokens[tokens.length - (n + 1)].split("=")[1]
+    end
+
+    def self.model_class_from_label(label:)
+      if !TFClient::Models.constants.include?(label.to_sym)
+        return nil
+      end
+
+      "TFClient::Models::#{label}".split("::").reduce(Object) do |obj, cls|
+        obj.const_get(cls)
+      end
     end
 
     attr_reader :command
@@ -88,26 +121,30 @@ module TFClient
     end
 
     def parse_nav
-      hash = {
-        coordinate: Models::Coordinate.new(tokens: ResponseParser.tokenize_line(line: @lines[0])),
-        brightness: Models::Brightness.new(tokens: ResponseParser.tokenize_line(line: @lines[1])),
-        asteroids: Models::Asteroids.new(tokens: ResponseParser.tokenize_line(line: @lines[2]))
-      }
-      hash[:links] = Models::Links.new(lines: @lines, start_index: 3)
-      hash[:planets] = Models::Planets.new(lines: @lines, start_index: hash[:links].lines_offset + 3)
-      hash[:structures] = Models::Structures.new(lines: @lines,
-                                                 start_index: 3 +
-                                                   hash[:links].lines_offset +
-                                                   hash[:planets].lines_offset )
-      response = []
-      response << hash[:coordinate].to_s
-      response << hash[:brightness].to_s
-      response << hash[:asteroids].to_s
-      response << hash[:links].response_str
-      response << hash[:planets].response_str
-      response << hash[:structures].response_str
+      TFClient::Models::Nav.new(lines: lines)
 
-      hash[:response] = response.join("\n")
+      #coordinate = Models::Coordinates.new(tokens: tokens
+      # hash = {
+      #   coordinate: Models::Coordinates.new(tokens: ResponseParser.tokenize_line(line: @lines[0])),
+      #   brightness: Models::Brightness.new(tokens: ResponseParser.tokenize_line(line: @lines[1])),
+      #   asteroids: Models::Asteroids.new(tokens: ResponseParser.tokenize_line(line: @lines[2]))
+      # }
+      # hash[:links] = Models::Links.new(lines: @lines, start_index: 3)
+      # hash[:planets] = Models::Planets.new(lines: @lines, start_index: hash[:links].lines_offset + 3)
+      # hash[:structures] = Models::Structures.new(lines: @lines,
+      #                                            start_index: 3 +
+      #                                              hash[:links].lines_offset +
+      #                                              hash[:planets].lines_offset )
+      # response = []
+      # response << hash[:coordinate].to_s
+      # response << hash[:brightness].to_s
+      # response << hash[:asteroids].to_s
+      # response << hash[:links].response_str
+      # response << hash[:planets].response_str
+      # response << hash[:structures].response_str
+      #
+      # hash[:response] = response.join("\n")
+      # hash
       hash
     end
   end

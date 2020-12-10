@@ -7,42 +7,72 @@ RSpec.describe TFClient::ResponseParser do
 
   context ".hash_with_values" do
     it "returns a hash with the key=value pairs at the end of a line" do
-      actual = described_class.hash_with_values(line: lines[0])
+      actual = described_class.hash_from_line_values(line: lines[0])
       expect(actual).to be == {x: "1", y: "2"}
 
-      actual = described_class.hash_with_values(line: lines[1])
+      actual = described_class.hash_from_line_values(line: lines[1])
       expect(actual).to be == {faction: "nibiru"}
 
-      actual = described_class.hash_with_values(line: lines[6])
+      actual = described_class.hash_from_line_values(line: lines[6])
       expect(actual).to be == {index: "4", link_drag: "32"}
 
-      actual = described_class.hash_with_values(line: lines[7])
+      actual = described_class.hash_from_line_values(line: lines[7])
       expect(actual).to be == {index: "5", faction: "nibiru", link_drag: "90"}
 
-      actual = described_class.hash_with_values(line: lines[10])
+      actual = described_class.hash_from_line_values(line: lines[10])
       expect(actual).to be == {index: "0", planet_type: "GAS"}
 
-      actual = described_class.hash_with_values(line: lines[12])
+      actual = described_class.hash_from_line_values(line: lines[12])
       expect(actual).to be == {
         index: "6", name: "notwendig", faction: "nibiru", planet_type: "Habitable"
       }
 
-      actual = described_class.hash_with_values(line: lines[15])
+      actual = described_class.hash_from_line_values(line: lines[15])
       expect(actual).to be == {id: "123", name: "abc's Ship", sclass: "AST"}
 
-      actual = described_class.hash_with_values(line: lines[18])
+      actual = described_class.hash_from_line_values(line: lines[18])
       expect(actual).to be == {id: "360", name: "hafen-9"}
     end
   end
 
-  context ".line_for_label" do
-    it "returns the line that begins with label"
-    it "returns nil if no line begins with label"
+  context ".line_and_index_for_label" do
+    it "returns the line and index that begins with label" do
+      line, index = described_class.line_and_index_for_label(lines: lines, label: "Coordinates")
+      expect(line).to be == "Coordinates: {x},{y}|Koordinaten: {x},{y}|x=1|y=2"
+      expect(index).to be == 0
+
+      line, index = described_class.line_and_index_for_label(lines: lines, label: "Planets")
+      expect(line).to be == "Planets:|Planeten:"
+      expect(index).to be == 9
+    end
+
+    it "returns nil, nil if no line begins with label" do
+      line, index = described_class.line_and_index_for_label(lines: lines,
+                                                             label: "Comets")
+      expect(line).to be == nil
+      expect(index).to be == -1
+    end
   end
 
-  context ".tokens_for_label" do
-    it "returns the line that begins with label, tokenized"
-    it "returns nil if not line begins with label"
+  context ".tokens_and_index_for_label" do
+    it "returns the line that begins with label, tokenized" do
+      tokens, index = described_class.tokens_and_index_for_label(lines: lines,
+                                                                 label: "Coordinates")
+      expect(tokens.count).to be == 4
+      expect(index).to be == 0
+
+      tokens, index = described_class.tokens_and_index_for_label(lines: lines,
+                                                                 label: "Planets")
+      expect(tokens.count).to be == 2
+      expect(index).to be == 9
+    end
+
+    it "returns nil if not line begins with label" do
+      tokens, index = described_class.line_and_index_for_label(lines: lines,
+                                                               label: "Comets")
+      expect(tokens).to be == nil
+      expect(index).to be == -1
+    end
   end
 
   context ".index_of_label" do
@@ -51,7 +81,7 @@ RSpec.describe TFClient::ResponseParser do
       expect(actual).to be == 0
 
       actual = described_class.index_of_label(lines: lines, label: "Links")
-      expect(actual).to be == 5
+      expect(actual).to be == 4
 
       actual = described_class.index_of_label(lines: lines, label: "Structures")
       expect(actual).to be == 14
@@ -77,10 +107,12 @@ RSpec.describe TFClient::ResponseParser do
 
   context ".collect_list_items" do
     it "returns lines that are list items until a non-item line is found" do
-      actual = described_class.collect_list_items(lines: lines, start_index: 4)
+      actual = described_class.collect_list_items(lines: lines, start_index: 5)
+
       expected = [
         "[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=0|link_drag=170",
         "[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=4|link_drag=32",
+        "[{index}] (faction: {faction}) drag: {link_drag}|       [{index}] (faction: {faction}) drag: {link_drag}|index=5|faction=nibiru|link_drag=90",
         "[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=7|link_drag=51"
       ]
       expect(actual).to be == expected
@@ -129,11 +161,25 @@ RSpec.describe TFClient::ResponseParser do
     end
   end
 
+  context ".model_class_from_label" do
+    it "returns a class in TFClient::Models for the label" do
+      actual = described_class.model_class_from_label(label: "Coordinates")
+      expect(actual.is_a?(Class)).to be == true
+      expect(actual.to_s).to be == "TFClient::Models::Coordinates"
+    end
+
+    it "returns nil if no class in TFClient::Models matches the label" do
+      actual = described_class.model_class_from_label(label: "Comets")
+      expect(actual).to be == nil
+    end
+  end
+
   context "#parse_nav" do
     it "returns a string that is ready to be printed" do
       hash = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
 
-      puts hash[:response]
+      puts hash
+
     end
   end
 

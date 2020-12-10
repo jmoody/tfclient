@@ -2,10 +2,14 @@
 module TFClient
   module Models
     class Model
-      attr_accessor :label, :translation
-      def initialize(label:, translation:)
-        @label = label
-        @translation = translation
+      attr_accessor :label, :translation, :values_hash
+
+      def initialize(line:)
+        tokens = ResponseParser.tokenize_line(line: line)
+        tokens_hash = ResponseParser.label_and_translation(tokens: tokens)
+        @label = tokens_hash[:label]
+        @translation = tokens_hash[:translation]
+        @values_hash = ResponseParser.hash_from_line_values(line: line)
       end
     end
 

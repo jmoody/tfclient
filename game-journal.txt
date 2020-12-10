@@ -75,16 +75,17 @@ H20 64 + 16 + 16 = 96
 
 Shipyard
 
-Iron = 320
-Carbon = 320
-
-- [x] Controller 2
+- [ ] Controller 2
+  - [ ] Silicon 2     => 2  => 4    =>   8  =>   16 =>   32
+  - [ ] Steel 1
+    - [ ] Iron 4      => 4  => 8    =>  16  =>   32 =>   64
 - [ ] Light Material 4
   - [ ] Carbon Alloy 4
-     - [ ] Iron 4      => 16 => 64
-     - [ ] Carbon 4    => 16 => 64
+     - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512
+     - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512
 - [ ] Heavy Plating 4
   - [ ] Carbon Alloy 16
-     - [ ] Iron 4      => 64 => 256
-     - [ ] Carbon 4    => 64 => 256
-  - [x] Thermal Pipe
+     - [ ] Iron 4      => 64 => 256 => 512  => 1024 => 2048
+     - [ ] Carbon 4    => 64 => 256 => 512  => 1024 => 2048
+  - [ ] Thermal Pipe
+     - [ ] Copper 4    => 4  => 16  =>  32  => 64   =>  128  Cu
