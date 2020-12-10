@@ -27,6 +27,6 @@ jobs:
     - name: Install dependencies
       run: bundle install
     - name: rspec unit
-      run: bundle rspec spec/lib
+      run: bundle exec rake unit
     - name: audit
       run: bundle audit check --update
