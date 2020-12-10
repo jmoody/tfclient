@@ -54,45 +54,6 @@ RSpec.describe TFClient::ResponseParser do
     end
   end
 
-  context ".tokens_and_index_for_label" do
-    it "returns the line that begins with label, tokenized" do
-      tokens, index = described_class.tokens_and_index_for_label(lines: lines,
-                                                                 label: "Coordinates")
-      expect(tokens.count).to be == 4
-      expect(index).to be == 0
-
-      tokens, index = described_class.tokens_and_index_for_label(lines: lines,
-                                                                 label: "Planets")
-      expect(tokens.count).to be == 2
-      expect(index).to be == 9
-    end
-
-    it "returns nil if not line begins with label" do
-      tokens, index = described_class.line_and_index_for_label(lines: lines,
-                                                               label: "Comets")
-      expect(tokens).to be == nil
-      expect(index).to be == -1
-    end
-  end
-
-  context ".index_of_label" do
-    it "returns the index of the line that begins with label" do
-      actual = described_class.index_of_label(lines: lines, label: "Coordinates")
-      expect(actual).to be == 0
-
-      actual = described_class.index_of_label(lines: lines, label: "Links")
-      expect(actual).to be == 4
-
-      actual = described_class.index_of_label(lines: lines, label: "Structures")
-      expect(actual).to be == 14
-    end
-
-    it "returns nil there is no line that begins with label" do
-      actual = described_class.index_of_label(lines: lines, label: "Lumen")
-      expect(actual).to be == nil
-    end
-  end
-
   context ".is_list_item?" do
     it "returns true when line begins with a tab char" do
       expect(described_class.is_list_item?(line: "\thello,abc")).to be == true
@@ -148,19 +109,6 @@ RSpec.describe TFClient::ResponseParser do
     end
   end
 
-  context ".nth_value_from_end" do
-    it "returns the value part of id=value structure in the nth from end position" do
-      line = "Coordinates: {x},{y}|Ordinates: {x},{y}|x=1|y=2"
-      tokens = described_class.tokenize_line(line: line)
-
-      actual = described_class.nth_value_from_end(tokens: tokens, n: 0)
-      expect(actual).to be == "2"
-
-      actual = described_class.nth_value_from_end(tokens: tokens, n: 1)
-      expect(actual).to be == "1"
-    end
-  end
-
   context ".model_class_from_label" do
     it "returns a class in TFClient::Models for the label" do
       actual = described_class.model_class_from_label(label: "Coordinates")
@@ -176,9 +124,8 @@ RSpec.describe TFClient::ResponseParser do
 
   context "#parse_nav" do
     it "returns a string that is ready to be printed" do
-      hash = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
-
-      puts hash
+      nav = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
+      expect(nav.is_a?(TFClient::Models::Nav))
 
     end
   end

@@ -1,6 +1,15 @@
 
 module TFClient
   module Models
+    class Response
+      attr_accessor :lines, :response
+
+      def initialize(lines:)
+        @lines = lines.dup
+        @response = []
+      end
+    end
+
     class Model
       attr_accessor :label, :translation, :values_hash
 
