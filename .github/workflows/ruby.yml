@@ -24,9 +24,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7
-    - name: Install dependencies
+    - name: bundle install
       run: bundle install
     - name: rspec unit
       run: bundle exec rake unit
-    - name: audit
-      run: bundle audit check --update
