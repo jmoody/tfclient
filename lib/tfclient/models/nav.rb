@@ -1,54 +1,112 @@
 
 module TFClient
   module Models
-    LINK_MAP = {
-      "0" => "sw",
-      "1" => "s",
-      "2" => "se",
-      "3" => "w",
-      "4" => "e",
-      "5" => "nw",
-      "6" => "n",
-      "7" => "ne"
-    }
+    class Nav < Response
 
-    # 0: 315 degrees, X=-1, Y=-1 (northwest)
-    # 1: 0 degrees, X=0, Y=-1 (north)
-    # 2: 45 degrees, X=1, Y=-1 (northeast)
-    # 3: 270 degrees, X=-1, Y=0 (west)
-    # 4: 90 degrees, X=1, Y=0 (east)
-    # 5: 225 degrees, X=-1, Y=1 (southwest)
-    # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
-    # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
+      GAME_LINK_TO_COMPASS_MAP = {
+        "0" => "sw",
+        "1" => "s",
+        "2" => "se",
+        "3" => "w",
+        "4" => "e",
+        "5" => "nw",
+        "6" => "n",
+        "7" => "ne"
+      }
 
-    LABELS = [
-      "Coordinates",
-      "Claimed by",
-      "Asteroids",
-      "Links",
-      "Planets",
-      "Structures"
-    ]
+      COMPASS_TO_GAME_LINK_MAP = {
+        "n" => 6,
+        "ne" => 7,
+        "e" => 4,
+        "se" => 2,
+        "s" => 1,
+        "sw" => 0,
+        "w" => 3,
+        "nw" => 5
+      }
 
-    class Nav
+      COMPASS_ORDER = {
+        "n" => 0,
+        "ne" => 1,
+        "e" => 2,
+        "se" => 3,
+        "s" => 4,
+        "sw" => 5,
+        "w" => 6,
+        "nw" => 7
+      }
+
+      # 7 # 0: 315 degrees, X=-1, Y=-1 (northwest)
+      # 0 # 1: 0 degrees, X=0, Y=-1 (north)
+      # 1 # 2: 45 degrees, X=1, Y=-1 (northeast)
+      # 6 # 3: 270 degrees, X=-1, Y=0 (west)
+      # 2 # 4: 90 degrees, X=1, Y=0 (east)
+      # 5 # 5: 225 degrees, X=-1, Y=1 (southwest)
+      # 4 # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
+      # 3 # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
+
+      LABELS = [
+        "Coordinates",
+        "Claimed by",
+        "Brightness",
+        "Asteroids",
+        "Links",
+        "Planets",
+        "Structures"
+      ].freeze
 
       attr_reader :coordinates, :claimed_by, :brightness, :asteroids
       attr_reader :links, :planets, :structures
 
       def initialize(lines:)
-        coordinate_line = ResponseParser.index_of_label(lines: lines, label: "Coordinates")
-        @coordinates = Coordinate.new(tokens: ResponseParser.tokenize_line(lines[coordinate_line]))
+        super(lines: lines)
+
+        LABELS.each_with_index do |label, label_index|
+          if @lines.empty?
+            raise "ran out of lines"
+          end
+
+          var_name = label.downcase.to_sym
+          class_name = label.dup
+          if label == "Claimed by"
+            class_name = "ClaimedBy"
+            var_name = :claimed_by
+          end
+
+          clazz = ResponseParser.model_class_from_label(label: class_name)
+          if clazz.nil?
+            raise "could not find class name"
+          end
+
+          line, _ = ResponseParser.line_and_index_for_label(lines: @lines,
+                                                            label: label)
+
+          # Claimed by is not always present
+          next if line.nil?
+
+          if label_index < 4
+            var = clazz.new(line: line)
+          else
+            var = clazz.new(lines: @lines)
+          end
+
+          instance_variable_set("@#{var_name}", var)
+          @response << var.to_s
+        end
+      end
+
+      def to_s
+        "#<Nav: #{@coordinates.to_s}>"
       end
     end
 
-    class Coordinate < Model
+    class Coordinates < Model
       attr_reader :x, :y
 
-      def initialize(tokens:)
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
-        @x = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
-        @y = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
+      def initialize(line:)
+        super(line: line)
+        @x = @values_hash[:x].to_i
+        @y = @values_hash[:y].to_i
       end
 
       def to_s
@@ -59,41 +117,37 @@ module TFClient
     class ClaimedBy < Model
       attr_reader :faction
 
-      def initialize(tokens:)
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
-        @faction = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
+      def initialize(line:)
+        super(line: line)
+        @faction = @values_hash[:faction]
       end
 
       def to_s
-        %Q[#{@translation}: '#{@faction}']
+        %Q[#{@translation} '#{@faction}']
       end
     end
 
     class Brightness < Model
-      attr_reader :brightness, :percent
+      attr_reader :value, :percent
 
-      def initialize(tokens:)
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
-        @brightness = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
-        @percent = ((@brightness/255.0) * 100).round
+      def initialize(line:)
+        super(line: line)
+        @value = @values_hash[:brightness].to_i
+        @percent = ((@value/255.0) * 100).round
       end
 
       def to_s
-        %Q[#{@translation}: #{@brightness} => #{@percent}%]
+        %Q[#{@translation}: #{@value} => #{@percent}%]
       end
     end
 
     class Asteroids < Model
-      attr_reader :brightness, :ore, :density, :percent
+      attr_reader :value, :ore, :density, :percent
 
-      def initialize(tokens:)
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation])
-        @ore = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1)
-        @density = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
-        @density = tokens[tokens.length - 1].split("=")[1].to_i
+      def initialize(line:)
+        super(line: line)
+        @ore = @values_hash[:asteroid_type]
+        @density = @values_hash[:asteroid_density].to_i
         @percent = ((@density/7.0) * 100).round
       end
 
@@ -104,59 +158,94 @@ module TFClient
 
     class Links < ModelWithItems
 
-      def initialize(lines:, start_index:)
-        tokens = ResponseParser.tokenize_line(line: lines[start_index])
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
-
-        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+      def initialize(lines:)
+        line, index = ResponseParser.line_and_index_for_label(lines: lines,
+                                                              label: "Links")
+        super(line: line)
+        items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
         @items = items.map do |item|
-          tokens = ResponseParser.tokenize_line(line: item.strip)
+          line = item.strip
+          hash = ResponseParser.hash_from_line_values(line: line)
 
-          index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
-          drag = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0).to_i
+          index = hash[:index].to_i
+          faction = hash[:faction]
+          drag = hash[:link_drag].to_i
+
           # direction is WIP
-          direction = LINK_MAP[index.to_s]
+          direction = Nav::GAME_LINK_TO_COMPASS_MAP[index.to_s]
           {
-            index: index, drag: drag, direction: direction,
-            string: %Q[[#{index}] drag: #{drag} => #{direction}]
+            index: index, drag: drag, direction: direction, faction: faction,
+            string: %Q[#{direction}\t[#{index}] drag: #{drag}\t#{faction}].strip
           }
+        end.sort do |a, b|
+          Nav::COMPASS_ORDER[a[:direction]] <=> Nav::COMPASS_ORDER[b[:direction]]
         end
+      end
+
+      def to_s
+        <<~EOM
+          #{@translation}:
+          #{@items.map { |item| %Q[\t\t#{item[:string]}]}.join("\n")}
+        EOM
       end
     end
 
     class Planets < ModelWithItems
 
-      def initialize(lines:, start_index:)
-        tokens = ResponseParser.tokenize_line(line: lines[start_index])
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
+      def initialize(lines:)
+        line, index = ResponseParser.line_and_index_for_label(lines: lines,
+                                                              label: "Planets")
+        super(line: line)
 
-        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+        items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
         @items = items.map do |item|
-          tokens = ResponseParser.tokenize_line(line: item.strip)
-          index = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1).to_i
-          type = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
-          { index: index, type: type, string: %Q[[#{index}] #{type}] }
+          line = item.strip
+
+          hash = ResponseParser.hash_from_line_values(line: line)
+
+          index = hash[:index].to_i
+          type = hash[:planet_type]
+          name = hash[:name]
+          faction = hash[:faction]
+
+          { index: index, type: type, name: name, faction: faction,
+            string: %Q[\t[#{index}] #{type}\t#{name}\t#{faction}].strip }
         end
+      end
+
+      def to_s
+        <<~EOM
+          #{@translation}:
+          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
+        EOM
       end
     end
 
     class Structures < ModelWithItems
 
-      def initialize(lines:, start_index:)
-        tokens = ResponseParser.tokenize_line(line: lines[start_index])
-        hash = TFClient::ResponseParser.label_and_translation(tokens: tokens)
-        super(label: hash[:label], translation: hash[:translation] )
+      def initialize(lines:)
+        line, index = ResponseParser.line_and_index_for_label(lines: lines,
+                                                              label: "Structures")
+        super(line: line)
 
-        items = ResponseParser.collect_list_items(lines: lines, start_index: start_index + 1)
+        items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
         @items = items.map do |item|
-          tokens = ResponseParser.tokenize_line(line: item.strip)
-          id = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 2).to_i
-          name = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 1)
-          sclass = TFClient::ResponseParser.nth_value_from_end(tokens: tokens, n: 0)
-          { id: id, name: name, sclass: sclass, string: %Q[[#{id}] #{name} [#{sclass}]]  }
+          line = item.strip
+
+          hash = ResponseParser.hash_from_line_values(line: line)
+
+          id = hash[:id].to_i
+          name = hash[:name]
+          type = hash[:sclass]
+          { id: id, name: name, type: type, string: %Q[[#{id}] #{name} #{type ? type : ""}] }
         end
+      end
+
+      def to_s
+        <<~EOM
+          #{@translation}:
+          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
+        EOM
       end
     end
   end

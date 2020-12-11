@@ -166,7 +166,7 @@ module TextFlight
         if dev
           ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
-        tcp_socket = TCPSocket.new(ENV["TF_HOST"], ENV["TF_PORT"])
+        tcp_socket = TCPSocket.new(host, port)
         socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
         socket.sync_close = true
         socket.connect
