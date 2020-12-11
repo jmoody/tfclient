@@ -17,8 +17,8 @@ RSpec.describe TFClient::Models do
 
   context "Coordinates" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_label(lines: lines,
-                                                                 label: "Coordinates")
+      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                          string: "Coordinates")
       actual = TFClient::Models::Coordinates.new(line: line)
       expect(actual.label).to be == "Coordinates"
       expect(actual.translation).to be == "Koordinaten"
@@ -31,8 +31,8 @@ RSpec.describe TFClient::Models do
 
   context "ClaimedBy" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_label(lines: lines,
-                                                                 label: "Claimed by")
+      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                          string: "Claimed by")
       actual = TFClient::Models::ClaimedBy.new(line: line)
       expect(actual.label).to be == "Claimed by"
       expect(actual.translation).to be == "Beansprucht von"
@@ -44,8 +44,8 @@ RSpec.describe TFClient::Models do
 
   context "Brightness" do
     it ".new can return a valid object from a  line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_label(lines: lines,
-                                                                 label: "Brightness")
+      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                          string: "Brightness")
       actual = TFClient::Models::Brightness.new(line: line)
       expect(actual.label).to be == "Brightness"
       expect(actual.translation).to be == "Helligkeit"
@@ -58,8 +58,8 @@ RSpec.describe TFClient::Models do
 
   context "Asteroid" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_label(lines: lines,
-                                                                 label: "Asteroids")
+      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                          string: "Asteroids")
       actual = TFClient::Models::Asteroids.new(line: line)
       expect(actual.label).to be == "Asteroids"
       expect(actual.translation).to be == "Ästeroiden"
