@@ -1,8 +1,8 @@
 
 RSpec.describe TFClient::Models do
   let(:fixtures_dir) { File.join("spec", "fixtures", "responses") }
-  let(:scan_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
-  let(:lines) { scan_response.lines(chomp: true)}
+  let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
+  let(:lines) { nav_response.lines(chomp: true)}
 
   context "Nav" do
     it ".new" do
