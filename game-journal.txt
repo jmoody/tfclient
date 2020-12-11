@@ -1,5 +1,4 @@
 
-
 37,44 Carbon 7 B: 227
 39,26 Uranium 7, B: 181 Barren, Greenhouse, Gas
 37,27 Iron 6, B 113 Greenhouse, Barren
@@ -11,7 +10,6 @@
 
 Nibiru
 11,20 Iron 0, B 175 Habitable!!!
-
 
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren - Gas 1920.0 second mining interval.
@@ -72,6 +70,24 @@ C 16                            = 16   256
 Fe 16                           = 16   256
 
 H20 64 + 16 + 16 = 96
+
+Living Spaces
+- [ ] Supply Packages 4
+  - [x] Oxygen    16     => 64  => 128
+  - [ ] Water     16     => 64  => 128
+    - [ ] Oxygen 1
+    - [ ] Hydrogen 2
+  - [x] Nutrients 16     => 64  => 128
+    - [ ] Carbon 1
+    - [ ] Water  1
+  - [x] Medicine  16     => 64  => 128
+    - [ ] Iron 1
+    - [ ] Hydrogen 1
+    - [ ] Water 1
+- [x] Thermal Pipe 4            => 8
+  - [x] Copper 4       => 16
+- [x] Steel 32                  => 64
+  - [x] Iron 4         => 128
 
 Shipyard
 
