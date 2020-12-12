@@ -152,18 +152,13 @@ RSpec.describe TFClient::ResponseParser do
     it "returns a string that is ready to be printed" do
       nav = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
       expect(nav.is_a?(TFClient::Models::Nav))
-
     end
   end
 
   context "parse scan" do
-
-    # let(:parser) { described_class.new(command: "scan", response: scan_response) }
-    #
-    # it "returns meaning information" do
-    #   actual = parser.parse
-    #   puts actual
-    #
-    # end
+    it "returns a string that is ready to be printed" do
+      scan = TFClient::ResponseParser.new(command: "scan", response: nav_response).parse
+      expect(scan.is_a?(TFClient::Models::Scan))
+    end
   end
 end

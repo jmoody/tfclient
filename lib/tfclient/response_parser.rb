@@ -92,6 +92,7 @@ module TFClient
     attr_reader :command
     attr_reader :response
     attr_reader :lines
+
     def initialize(command:, response:)
       @command = command
       @response = response
@@ -102,8 +103,10 @@ module TFClient
       case command
       when "nav"
         return parse_nav
-        else
-          return lines.join("\n")
+      when "scan"
+        return parse_nav
+      else
+        return lines.join("\n")
       end
     end
 
@@ -111,6 +114,11 @@ module TFClient
       nav = TFClient::Models::Nav.new(lines: lines)
 
       puts nav.response
+    end
+
+    def parse_scan
+      scan = TFClient::Models::Scan.new(lines: lines)
+      puts scan.response
     end
   end
 end

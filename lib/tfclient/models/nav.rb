@@ -229,7 +229,7 @@ module TFClient
           id = hash[:id].to_i
           name = hash[:name]
           type = hash[:sclass]
-          { id: id, name: name, type: type, string: %Q[[#{id}] #{name} #{type ? type : ""}] }
+          { id: id, name: name, type: type, string: %Q[[#{id}]\t#{name} #{type ? type : ""}] }
         end
       end
 
