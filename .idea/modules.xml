@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/client.iml" filepath="$PROJECT_DIR$/.idea/client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../textflight/.idea/textflight.iml" filepath="$PROJECT_DIR$/../textflight/.idea/textflight.iml" />
     </modules>
   </component>
 </project>
