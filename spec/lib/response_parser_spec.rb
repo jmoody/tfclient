@@ -5,6 +5,26 @@ RSpec.describe TFClient::ResponseParser do
   let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
   let(:lines) { nav_response.lines }
 
+  context ".substitute_values" do
+    it "returns the same string if there is no pipe char" do
+      line = "Planets:\n"
+      actual = described_class.substitute_line_values(line: line)
+      expect(actual).to be == line.chomp
+    end
+
+    it "returns the translated token if there are no substitutions" do
+      line = "Planets:|Planeten:\n"
+      actual = described_class.substitute_line_values(line: line)
+      expect(actual).to be == "Planeten:"
+    end
+
+    it "returns string with values substituted" do
+      line = "[{index}] (faction: {faction}) drag: {link_drag}|\t[{index}] (faction: {faction}) drag: {link_drag}|index=5|faction=nibiru|link_drag=90\n"
+      actual = described_class.substitute_line_values(line: line)
+      expect(actual).to be == "\t[5] (faction: nibiru) drag: 90"
+    end
+  end
+
   context ".hash_with_values" do
     it "returns a hash with the key=value pairs at the end of a line" do
       actual = described_class.hash_from_line_values(line: lines[0])
@@ -145,20 +165,6 @@ RSpec.describe TFClient::ResponseParser do
     it "returns nil if no class in TFClient::Models matches the label" do
       actual = described_class.model_class_from_string(string: "Comets")
       expect(actual).to be == nil
-    end
-  end
-
-  context "#parse_nav" do
-    it "returns a string that is ready to be printed" do
-      nav = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
-      expect(nav.is_a?(TFClient::Models::Nav))
-    end
-  end
-
-  context "parse scan" do
-    it "returns a string that is ready to be printed" do
-      scan = TFClient::ResponseParser.new(command: "scan", response: nav_response).parse
-      expect(scan.is_a?(TFClient::Models::Scan))
     end
   end
 end
