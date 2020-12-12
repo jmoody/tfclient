@@ -18,9 +18,9 @@ module TFClient
     end
 
     # returns two values
-    def self.line_and_index_for_label(lines:, label:)
+    def self.line_and_index_for_beginning_with(lines:, string:)
       lines.each_with_index do |line, index|
-        return line.chomp, index if line[/#{label}/]
+        return line.chomp, index if line.start_with?(string)
       end
       return nil, -1
     end
@@ -67,12 +67,24 @@ module TFClient
       end
     end
 
-    def self.model_class_from_label(label:)
-      if !TFClient::Models.constants.include?(label.to_sym)
+    def self.camel_case_from_string(string:)
+      string.split(" ").map do |token|
+        token.capitalize
+      end.join("")
+    end
+
+    def self.snake_case_sym_from_string(string:)
+      string.split(" ").map do |token|
+        token.downcase
+      end.join("_").to_sym
+    end
+
+    def self.model_class_from_string(string:)
+      if !TFClient::Models.constants.include?(string.to_sym)
         return nil
       end
 
-      "TFClient::Models::#{label}".split("::").reduce(Object) do |obj, cls|
+      "TFClient::Models::#{string}".split("::").reduce(Object) do |obj, cls|
         obj.const_get(cls)
       end
     end
@@ -80,6 +92,7 @@ module TFClient
     attr_reader :command
     attr_reader :response
     attr_reader :lines
+
     def initialize(command:, response:)
       @command = command
       @response = response
@@ -90,8 +103,10 @@ module TFClient
       case command
       when "nav"
         return parse_nav
-        else
-          return lines.join("\n")
+      when "scan"
+        return parse_nav
+      else
+        return lines.join("\n")
       end
     end
 
@@ -99,6 +114,11 @@ module TFClient
       nav = TFClient::Models::Nav.new(lines: lines)
 
       puts nav.response
+    end
+
+    def parse_scan
+      scan = TFClient::Models::Scan.new(lines: lines)
+      puts scan.response
     end
   end
 end

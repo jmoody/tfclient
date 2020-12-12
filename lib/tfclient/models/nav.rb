@@ -62,24 +62,16 @@ module TFClient
         super(lines: lines)
 
         LABELS.each_with_index do |label, label_index|
-          if @lines.empty?
-            raise "ran out of lines"
-          end
+          var_name = ResponseParser.snake_case_sym_from_string(string: label)
+          class_name = ResponseParser.camel_case_from_string(string: label)
 
-          var_name = label.downcase.to_sym
-          class_name = label.dup
-          if label == "Claimed by"
-            class_name = "ClaimedBy"
-            var_name = :claimed_by
-          end
-
-          clazz = ResponseParser.model_class_from_label(label: class_name)
+          clazz = ResponseParser.model_class_from_string(string: class_name)
           if clazz.nil?
-            raise "could not find class name"
+            raise "could not find class name: #{class_name}"
           end
 
-          line, _ = ResponseParser.line_and_index_for_label(lines: @lines,
-                                                            label: label)
+          line, _ = ResponseParser.line_and_index_for_beginning_with(lines: @lines,
+                                                                     string: label)
 
           # Claimed by is not always present
           next if line.nil?
@@ -159,8 +151,8 @@ module TFClient
     class Links < ModelWithItems
 
       def initialize(lines:)
-        line, index = ResponseParser.line_and_index_for_label(lines: lines,
-                                                              label: "Links")
+        line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                       string: "Links")
         super(line: line)
         items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
         @items = items.map do |item|
@@ -193,8 +185,8 @@ module TFClient
     class Planets < ModelWithItems
 
       def initialize(lines:)
-        line, index = ResponseParser.line_and_index_for_label(lines: lines,
-                                                              label: "Planets")
+        line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                       string: "Planets")
         super(line: line)
 
         items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
@@ -224,8 +216,8 @@ module TFClient
     class Structures < ModelWithItems
 
       def initialize(lines:)
-        line, index = ResponseParser.line_and_index_for_label(lines: lines,
-                                                              label: "Structures")
+        line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                       string: "Structures")
         super(line: line)
 
         items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
@@ -237,7 +229,7 @@ module TFClient
           id = hash[:id].to_i
           name = hash[:name]
           type = hash[:sclass]
-          { id: id, name: name, type: type, string: %Q[[#{id}] #{name} #{type ? type : ""}] }
+          { id: id, name: name, type: type, string: %Q[[#{id}]\t#{name} #{type ? type : ""}] }
         end
       end
 

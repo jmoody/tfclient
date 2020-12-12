@@ -28,3 +28,5 @@ jobs:
       run: bundle install
     - name: rspec unit
       run: bundle exec rake unit
+    - name: start server in container
+      run: bundle exec rake server

@@ -20,6 +20,6 @@ RSpec::Core::RakeTask.new(:integration) do |task|
 end
 
 task :server do
-  sh "docker-compose up --build --remove-orphans"
+  sh "docker-compose up --build --remove-orphans --detach"
 end
 

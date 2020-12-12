@@ -37,18 +37,18 @@ RSpec.describe TFClient::ResponseParser do
 
   context ".line_and_index_for_label" do
     it "returns the line and index that begins with label" do
-      line, index = described_class.line_and_index_for_label(lines: lines, label: "Coordinates")
+      line, index = described_class.line_and_index_for_beginning_with(lines: lines, string: "Coordinates")
       expect(line).to be == "Coordinates: {x},{y}|Koordinaten: {x},{y}|x=1|y=2"
       expect(index).to be == 0
 
-      line, index = described_class.line_and_index_for_label(lines: lines, label: "Planets")
+      line, index = described_class.line_and_index_for_beginning_with(lines: lines, string: "Planets")
       expect(line).to be == "Planets:|Planeten:"
       expect(index).to be == 9
     end
 
     it "returns nil, nil if no line begins with label" do
-      line, index = described_class.line_and_index_for_label(lines: lines,
-                                                             label: "Comets")
+      line, index = described_class.line_and_index_for_beginning_with(lines: lines,
+                                                                      string: "Comets")
       expect(line).to be == nil
       expect(index).to be == -1
     end
@@ -109,15 +109,41 @@ RSpec.describe TFClient::ResponseParser do
     end
   end
 
+  context ".camel_case_from_label" do
+    it "returns a camel-case string from label" do
+      actual = described_class.camel_case_from_string(string: "Coordinates")
+      expect(actual).to be == "Coordinates"
+
+      actual = described_class.camel_case_from_string(string: "Claimed by")
+      expect(actual).to be == "ClaimedBy"
+
+      actual = described_class.camel_case_from_string(string: "A b c")
+      expect(actual).to be == "ABC"
+    end
+  end
+
+  context ".snake_case_sym_from_label" do
+    it "returns a snake-case symbol from label" do
+      actual = described_class.snake_case_sym_from_string(string: "Coordinates")
+      expect(actual).to be == :coordinates
+
+      actual = described_class.snake_case_sym_from_string(string: "Claimed by")
+      expect(actual).to be == :claimed_by
+
+      actual = described_class.snake_case_sym_from_string(string: "A b c")
+      expect(actual).to be == :a_b_c
+    end
+  end
+
   context ".model_class_from_label" do
     it "returns a class in TFClient::Models for the label" do
-      actual = described_class.model_class_from_label(label: "Coordinates")
+      actual = described_class.model_class_from_string(string: "Coordinates")
       expect(actual.is_a?(Class)).to be == true
       expect(actual.to_s).to be == "TFClient::Models::Coordinates"
     end
 
     it "returns nil if no class in TFClient::Models matches the label" do
-      actual = described_class.model_class_from_label(label: "Comets")
+      actual = described_class.model_class_from_string(string: "Comets")
       expect(actual).to be == nil
     end
   end
@@ -126,18 +152,13 @@ RSpec.describe TFClient::ResponseParser do
     it "returns a string that is ready to be printed" do
       nav = TFClient::ResponseParser.new(command: "nav", response: nav_response).parse
       expect(nav.is_a?(TFClient::Models::Nav))
-
     end
   end
 
   context "parse scan" do
-
-    # let(:parser) { described_class.new(command: "scan", response: scan_response) }
-    #
-    # it "returns meaning information" do
-    #   actual = parser.parse
-    #   puts actual
-    #
-    # end
+    it "returns a string that is ready to be printed" do
+      scan = TFClient::ResponseParser.new(command: "scan", response: nav_response).parse
+      expect(scan.is_a?(TFClient::Models::Scan))
+    end
   end
 end
