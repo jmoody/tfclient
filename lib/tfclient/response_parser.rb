@@ -90,29 +90,41 @@ module TFClient
     end
 
     attr_reader :command
+    attr_reader :textflight_command
     attr_reader :response
     attr_reader :lines
 
-    def initialize(command:, response:)
+    def initialize(command:, textflight_command:, response:)
       @command = command
+      @textflight_command = textflight_command
       @response = response
     end
 
     def parse
       @lines = @response.lines(chomp: true).reject { |line| line.length == 0 }
-      case command
+      case @textflight_command
       when "nav"
-        return parse_nav
+        parse_nav
       when "scan"
-        return parse_nav
+        parse_scan
       else
-        return lines.join("\n")
+        if @response[/#{Models::STATUS_BEGIN}/]
+          @response = @lines[0].chomp
+          @lines = [@response]
+        end
+
+        if @response[/|/]
+          @lines.each do |line|
+            puts line.split("|")[0]
+          end
+        else
+          puts @response
+        end
       end
     end
 
     def parse_nav
       nav = TFClient::Models::Nav.new(lines: lines)
-
       puts nav.response
     end
 

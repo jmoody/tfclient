@@ -31,7 +31,8 @@ module TFClient
         return "exit"
       end
 
-      if @command.length < 3 && (direction = DIRECTION_MAP[@command.to_sym])
+      direction = DIRECTION_MAP[@command.to_sym]
+      if direction
         "jump #{direction}"
       else
         @command

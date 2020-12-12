@@ -54,21 +54,29 @@ module TextFlight
 
           if response == :wait_readable
             if tries < max_tries
-              puts "received :wait_readable on try: #{tries} of #{max_tries}; retrying"
+              TFClient.debug(
+                "received :wait_readable on try: #{tries} of #{max_tries}; retrying"
+              )
               tries = tries + 1
-              sleep(0.5)
+              sleep(0.2)
               next
             else
-              puts "received :wait_readable on try: #{tries} of #{max_tries}; breaking"
+              TFClient.debug(
+                "received :wait_readable on try: #{tries} of #{max_tries}; breaking"
+              )
               # could be we have to exit here
               break
             end
           elsif response == nil
-            puts "received 'nil' on try: #{tries} of #{max_tries}; exiting"
+            TFClient.error(
+              "received 'nil' on try: #{tries} of #{max_tries}; exiting"
+            )
             raise("Server returned nil, possibly because of rate limiting")
           end
 
-          puts "received #{response.bytesize} bytes; pushing onto buffer"
+          TFClient.debug(
+            "received #{response.bytesize} bytes; pushing onto buffer"
+          )
           tries = 1
           response.delete_prefix!("> ")
           response.delete_suffix!("> ")
@@ -76,7 +84,7 @@ module TextFlight
           response = TFClient::StringUtils.remove_color_control_chars(string: response)
           buffer = buffer + response
 
-          sleep(0.5)
+          sleep(0.2)
         end
       rescue StandardError, IOError => e
         message = <<~EOM
@@ -92,7 +100,9 @@ module TextFlight
         raise(e.class, message)
       end
 
-      buffer.lines(chomp:true)
+      buffer
+
+      #buffer.lines(chomp:true)
     end
 
     def self.parse_response(response:)
@@ -102,44 +112,36 @@ module TextFlight
     end
 
     def self.register(socket:, user:, pass:)
-      puts("=== REGISTER ===")
-      puts("user: #{user} pass: #{pass[0..3]}***")
+      TFClient.debug("=== REGISTER ===")
+      TFClient.info("registering user: #{user} pass: #{pass[0..3]}***")
       sleep(0.5)
       self.write_command(socket: socket, command: "register #{user} #{pass}")
 
       response = self.read_response(socket: socket)
-      response.each do |line|
-        puts "#{line}"
-      end
-
+      puts response
     end
 
     def self.login(socket:, user:, pass:)
-      puts("=== LOGIN ===")
-      puts("user: #{user} pass: #{pass[0..3]}***")
+      TFClient.debug("=== LOGIN ===")
+      TFClient.info("logging in user: #{user} pass: #{pass[0..3]}***")
       sleep(0.5)
       self.write_command(socket: socket, command: "login #{user} #{pass}")
 
       response = self.read_response(socket: socket)
-      if response[0] && response[0].chomp == "Incorrect username or password."
-        puts "#{response[0].chomp}"
+      lines = response.lines(chomp: true)
+      if lines[0] && lines[0].chomp == "Incorrect username or password."
+        TFClient.error("#{response[0].chomp}")
         socket.close
         exit(1)
-      end
-
-      response.each do |line|
-        puts "#{line}"
       end
     end
 
     def self.enable_client_mode(socket:)
+      TFClient.debug("=== ENABLE CLIENT MODE ===")
       sleep(0.5)
-      puts("=== ENABLE CLIENT MODE ===")
-      self.write_command(socket: socket, command: "language client")
+      self.write_command(socket: socket, command: "language client-on")
       response = self.read_response(socket: socket)
-      response.each do |line|
-        puts "#{line}"
-      end
+      puts response
     end
 
     attr_reader :socket, :user, :pass, :host, :port, :ssl, :state, :dev
@@ -180,6 +182,9 @@ module TextFlight
       begin
         loop do
           command = Readline.readline("tf > ", true)
+          if command.strip == ""
+            next
+          end
           parsed_command = TFClient::CommandParser.new(command: command).parse
 
           if parsed_command == "exit"
@@ -191,8 +196,11 @@ module TextFlight
 
           TextFlight::CLI.write_command(socket: socket, command: parsed_command)
 
+          # set, jump reply with STATUSREPORT
           response = TextFlight::CLI.read_response(socket: @socket)
-          TextFlight::CLI.parse_response(response: response)
+          TFClient::ResponseParser.new(command: command,
+                                       textflight_command: parsed_command,
+                                       response: response).parse
         end
       rescue IOError => e
         puts e.message
