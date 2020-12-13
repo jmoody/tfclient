@@ -151,11 +151,13 @@ module TFClient
     def parse_nav
       nav = TFClient::Models::Nav.new(lines: lines)
       puts nav.response
+      nav
     end
 
     def parse_scan
       scan = TFClient::Models::Scan.new(lines: lines)
       puts scan.response
+      scan
     end
 
     def parse_status
@@ -184,6 +186,8 @@ module TFClient
         puts ResponseParser.substitute_values(
           lines: lines_after_status
         ).join("\n")
+
+        Models::StatusReport.new(lines: @lines[index_start...index_end])
       end
     end
   end

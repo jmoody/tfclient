@@ -139,9 +139,29 @@ module TextFlight
     def self.enable_client_mode(socket:)
       TFClient.debug("=== ENABLE CLIENT MODE ===")
       sleep(0.5)
-      self.write_command(socket: socket, command: "language client-on")
+      self.write_command(socket: socket, command: "language client")
       response = self.read_response(socket: socket)
       puts response
+    end
+
+    def self.status(socket:)
+      sleep(0.5)
+      TextFlight::CLI.write_command(socket: socket, command: "status")
+      sleep(0.5)
+      response = TextFlight::CLI.read_response(socket: socket)
+      TFClient::ResponseParser.new(command: "status",
+                                   textflight_command: "status",
+                                   response: response).parse
+    end
+
+    def self.nav(socket: @socket)
+      sleep(0.5)
+      TextFlight::CLI.write_command(socket: socket, command: "nav")
+      sleep(0.5)
+      response = TextFlight::CLI.read_response(socket: socket)
+      TFClient::ResponseParser.new(command: "nav",
+                                   textflight_command: "nav",
+                                   response: response).parse
     end
 
     attr_reader :socket, :user, :pass, :host, :port, :ssl, :state, :dev
@@ -158,6 +178,13 @@ module TextFlight
       TextFlight::CLI.register(socket: @socket, user: @user, pass: @pass)
       TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
       TextFlight::CLI.enable_client_mode(socket: @socket)
+
+      status_report = TextFlight::CLI.status(socket: @socket)
+      nav = TextFlight::CLI.nav(socket: @socket)
+
+      @prompt = TFClient::TFPrompt.new(status_report: status_report)
+      @prompt.x = nav.coordinates.x
+      @prompt.y = nav.coordinates.y
       read_eval_print
     end
 
@@ -181,7 +208,7 @@ module TextFlight
     def read_eval_print
       begin
         loop do
-          command = Readline.readline("tf > ", true)
+          command = Readline.readline("#{@prompt.to_s}", true)
           if command.strip == ""
             next
           end
@@ -198,9 +225,18 @@ module TextFlight
 
           # set, jump reply with STATUSREPORT
           response = TextFlight::CLI.read_response(socket: @socket)
-          TFClient::ResponseParser.new(command: command,
-                                       textflight_command: parsed_command,
-                                       response: response).parse
+          instance = TFClient::ResponseParser.new(command: command,
+                                                  textflight_command: parsed_command,
+                                                  response: response).parse
+          if instance.is_a?(TFClient::Models::StatusReport)
+            @prompt.mass = instance.hash[:mass].to_i
+            @prompt.warp_charge = instance.hash[:warp_charge].to_i
+          end
+
+          if instance.is_a?(TFClient::Models::Nav)
+            @prompt.x = instance.coordinates.x
+            @prompt.y = instance.coordinates.y
+          end
         end
       rescue IOError => e
         puts e.message

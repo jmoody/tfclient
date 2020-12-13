@@ -6,6 +6,8 @@ require "tfclient/response_parser"
 require "tfclient/models/model"
 require "tfclient/models/nav"
 require "tfclient/models/scan"
+require "tfclient/models/status_report"
+require "tfclient/tfprompt"
 
 module TFClient
 

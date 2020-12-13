@@ -112,7 +112,7 @@ module TFClient
           mark = hash[:mark].to_i
           setting = hash[:setting].to_i
           { index: index, name: name, mark: mark, setting: setting,
-            string: %Q[[#{index}]\t#{setting}\t#{name} (#{mark.to_roman})]
+            string: %Q[[#{index}] #{name} (#{mark.to_roman})\t\t#{setting}]
           }
         end
       end
@@ -146,7 +146,7 @@ module TFClient
           name = hash[:name]
           count = hash[:count].to_i
           { index: index, name: name, count: count,
-            string: %Q[[#{index}]\t#{count}\t#{name}]
+            string: %Q[[#{index}] #{name}\t\t#{count}]
           }
         end
       end

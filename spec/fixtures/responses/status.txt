@@ -1,0 +1,60 @@
+STATUSREPORT BEGIN
+now: 1607776273.977538
+stime: 0.000000
+shutdown: 1
+mass: 26.000000
+outfit_space: 0.000000
+heat_rate: 0.000000
+max_heat: 60.000000
+energy_rate: 0.000000
+max_energy: 120.000000
+shield_rate: 0.000000
+max_shield: 60.000000
+warp_rate: 0.000000
+normal_warp: 8.000000
+antigravity: 0.000000
+electron_damage: 0.000000
+emp_damage: 0.000000
+hull_damage: 0.000000
+plasma_damage: 0.000000
+mining_power: 0.000000
+assembly_rate: 0.000000
+shipyard: 0.000000
+crew: 0.000000
+food: 0.000000
+attack: 1.000000
+defence: 1.000000
+id: 358
+created_at: 1606327847.000000
+name: ydoomj's Ship
+type: ship
+total_outfit_space: 8
+heat: 0.000000
+energy: 0.000000
+shield: 0.000000
+warp_charge: 0.000000
+mining_progress: 0.000000
+sys_id: 0
+asteroid_type: Copper Ore
+asteroid_richness: 2
+planet: 1
+queue_size: 0
+targets_size: 0
+STATUSREPORT END
+General:|General:
+	Mass: {mass}|   Mass: {mass}|mass=26
+	Outfit space: {space}/{total}|  Outfit space: {space}/{total}|space=0|total=8
+	Heat: {heat}/{max}|     Heat: {heat}/{max}|heat=0|max=60
+	Energy: {energy}/{max}| Energy: {energy}/{max}|energy=0|max=120
+Stability:|Stability:
+	Cooling status: Stable| Cooling status: Stable
+	Net heat generation: {heat_rate}/s|     Net heat generation: {heat_rate}/s|heat_rate=-2.1
+	Power status: Stable|   Power status: Stable
+	Net energy consumption: {energy_rate}/s|        Net energy consumption: {energy_rate}/s|energy_rate=-1.1
+Fuel:|Fuel:
+	[{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|    [{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|index=0|name=Fusion Reactor|mark=1|remaining=57455
+Shields: Regenerating at {rate}/s ({shield}/{max})|Shields: Regenerating at {rate}/s ({shield}/{max})|shield=24|max=60|rate=0.2
+Warp engines: Charging ({charge}%)|Warp engines: Charging ({charge}%)|charge=25
+Antigravity engines: Online|Antigravity engines: Online
+Mining progress: {progress}% ({interval} second interval)|Mining progress: {progress}% ({interval} second interval)|progress=22|interval=560.0
+
