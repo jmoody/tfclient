@@ -166,8 +166,7 @@ module TFClient
           # direction is WIP
           direction = Nav::GAME_LINK_TO_COMPASS_MAP[index.to_s]
           {
-            index: index, drag: drag, direction: direction, faction: faction,
-            string: %Q[#{direction}\t[#{index}] drag: #{drag}\t#{faction}].strip
+            index: index, drag: drag, direction: direction, faction: faction
           }
         end.sort do |a, b|
           Nav::COMPASS_ORDER[a[:direction]] <=> Nav::COMPASS_ORDER[b[:direction]]
@@ -175,10 +174,26 @@ module TFClient
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          "#{@translation}:",
+          {value: "drag", alignment: :center},
+          {value: "faction", alignment: :center},
+          {value: "index", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << [
+            "     #{item[:direction]}",
+            item[:drag],
+            item[:faction],
+            "[#{item[:index]}]"
+          ]
+        end
+
+        table.render(:ascii, padding: [0,2,0,2],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center]
+        end
       end
     end
 
@@ -200,16 +215,31 @@ module TFClient
           name = hash[:name]
           faction = hash[:faction]
 
-          { index: index, type: type, name: name, faction: faction,
-            string: %Q[\t[#{index}] #{type}\t#{name}\t#{faction}].strip }
+          { index: index, type: type, name: name, faction: faction }
         end
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          "#{@translation}:",
+          {value: "type", alignment: :center},
+          {value: "name", alignment: :center},
+          {value: "faction", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << [
+            "     [#{item[:index]}]",
+            item[:type],
+            item[:name],
+            item[:faction]
+          ]
+        end
+
+        table.render(:ascii, padding: [0,2,0,2],
+                     width: Models::TABLE_WIDTH) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center]
+        end
       end
     end
 
@@ -228,16 +258,27 @@ module TFClient
 
           id = hash[:id].to_i
           name = hash[:name]
-          type = hash[:sclass]
-          { id: id, name: name, type: type, string: %Q[[#{id}]\t#{name} #{type ? type : ""}] }
+          # TODO: distinguish shipyards from bases
+          type = hash[:sclass] || "base"
+          { id: id, name: name, type: type }
         end
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          "#{@translation}:",
+          {value: "name", alignment: :center},
+          {value: "ship class", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << ["     [#{item[:id]}]", item[:name], item[:type]]
+        end
+
+        table.render(:ascii, padding: [0,2,0,2],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:right, :right, :center]
+        end
       end
     end
   end

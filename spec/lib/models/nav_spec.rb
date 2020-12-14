@@ -154,7 +154,7 @@ RSpec.describe TFClient::Models do
 
       expect(actual.items[3][:id]).to be == 360
       expect(actual.items[3][:name]).to be == "hafen-9"
-      expect(actual.items[3][:type]).to be == nil
+      expect(actual.items[3][:type]).to be == "base"
 
       puts actual
     end

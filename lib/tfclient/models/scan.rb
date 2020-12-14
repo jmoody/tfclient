@@ -94,7 +94,8 @@ module TFClient
     end
 
     class Outfits < ModelWithItems
-      require "cousin_roman"
+
+      attr_accessor :max_slots
 
       def initialize(lines:)
         line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
@@ -111,17 +112,33 @@ module TFClient
           name = hash[:name]
           mark = hash[:mark].to_i
           setting = hash[:setting].to_i
-          { index: index, name: name, mark: mark, setting: setting,
-            string: %Q[[#{index}] #{name} (#{mark.to_roman})\t\t#{setting}]
-          }
+          { index: index, name: name, mark: mark, setting: setting}
         end
+
+        # TODO maybe pass as an argument or set after initialization
+        # TODO The max number of slots is in the OutfitSpace object
+        @max_slots = 8
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          "#{@translation}: #{slots_used}/#{@max_slots} slots",
+          {value: "name", alignment: :center},
+          {value: "setting", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << [
+            "     [#{item[:index]}]",
+            "#{item[:name]} (#{item[:mark].to_roman})",
+            item[:setting]
+          ]
+        end
+
+        table.render(:ascii, padding: [0,2,0,2],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:right, :right, :center]
+        end
       end
 
       def slots_used
@@ -145,19 +162,35 @@ module TFClient
           index = hash[:index].to_i
           name = hash[:name]
           count = hash[:count].to_i
-          { index: index, name: name, count: count,
-            string: %Q[[#{index}] #{name}\t\t#{count}]
-          }
+          # TODO: this must be the mark?
+          mark = hash[:extra].to_i
+          { index: index, name: name, count: count, mark: mark}
         end
       end
 
       def to_s
-        <<~EOM
-          #{@translation} weight: #{weight}
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          "#{@translation}: weight #{weight}",
+          {value: "cargo", alignment: :center},
+          {value: "amount", alignment: :center}
+        ])
+
+        @items.each do |item|
+          name = item[:name]
+          mark = item[:mark].to_i
+          if mark && (mark != 0)
+            name = "#{name} (#{mark.to_roman})"
+          end
+          table << ["     [#{item[:index]}]", name, item[:count]]
+        end
+
+        table.render(:ascii, padding: [0,2,0,2],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:right, :right, :center]
+        end
       end
 
+      # TODO: only some items in the inventory contribute to weight
       def weight
         @items.map { |hash| hash[:count] }.sum
       end

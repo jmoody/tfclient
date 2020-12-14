@@ -1,6 +1,10 @@
 
 module TFClient
   module Models
+    require "cousin_roman"
+
+    TABLE_WIDTH = 65.freeze
+
     class Response
       attr_accessor :lines, :response
 
@@ -23,6 +27,8 @@ module TFClient
     end
 
     class ModelWithItems < Model
+      require "tty-table"
+
       attr_reader :items
 
       def count
