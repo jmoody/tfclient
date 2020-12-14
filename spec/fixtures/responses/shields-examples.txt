@@ -1,0 +1,12 @@
+# Shield regenerating
+Shields: Regenerating at {rate}/s ({shield}/{max})|Shields: Regenerating at {rate}/s ({shield}/{max})|shield=19|max=60|rate=1.0
+# Shield Online
+Shields: Online|Shields: Online
+# Shields failed
+Shields: FAILED|Shields: FAILED
+
+
+
+BEGIN Engines charging
+Warp engines: Charging ({charge}%)|Warp engines: Charging ({charge}%)|charge=25
+END

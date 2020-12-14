@@ -1,0 +1,4 @@
+# Engines ready
+Warp engines: Ready to engage|Warp engines: Ready to engage
+# Engines charging
+Warp engines: Charging ({charge}%)|Warp engines: Charging ({charge}%)|charge=97
