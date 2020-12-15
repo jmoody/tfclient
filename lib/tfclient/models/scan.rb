@@ -52,6 +52,25 @@ module TFClient
           @response << var.to_s
         end
       end
+
+      # def response
+      #   table = TTY::Table.new(header: [
+      #     {value: @owner.translation, alignment: :center},
+      #     {value: @outfit_space.translation, alignment: :center},
+      #     {value: @shield_charge.translation, alignment: :center}
+      #   ])
+      #
+      #   table << [@owner.username,
+      #             @outfit_space.value,
+      #             @shield_charge.value]
+      #   table.render(:ascii, padding: [0,2,0,2],
+      #                width: Models::TABLE_WIDTH, resize: true) do |renderer|
+      #     renderer.alignments= [:center, :center, :center]
+      #   end
+      #
+      #   puts @outfits.to_s
+      #   puts @cargo.to_s
+      # end
     end
 
     class Owner < Model

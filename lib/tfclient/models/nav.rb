@@ -221,7 +221,7 @@ module TFClient
 
       def to_s
         table = TTY::Table.new(header: [
-          "#{@translation}:",
+          "#{@translation}",
           {value: "type", alignment: :center},
           {value: "name", alignment: :center},
           {value: "faction", alignment: :center}
@@ -229,7 +229,7 @@ module TFClient
 
         @items.each do |item|
           table << [
-            "     [#{item[:index]}]",
+            "          [#{item[:index]}]",
             item[:type],
             item[:name],
             item[:faction]

@@ -11,6 +11,7 @@
 Nibiru
 11,20 Iron 0, B 175 Habitable!!!
 
+ 9,20 U 6  B 157 - None
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren - Gas 1920.0 second mining interval.
 12,19 Si 5, B 204 - Frozen, Gas, Gas
@@ -90,18 +91,20 @@ Living Spaces
   - [x] Iron 4         => 128
 
 Shipyard
-
-- [ ] Controller 2
-  - [ ] Silicon 2     => 2  => 4    =>   8  =>   16 =>   32
+                                II      III     IV      V
+- [x] Controller 2              4        8      16      32
+  - [ ] Silicon 2      => 2  => 4   =>   8  =>  16 =>   32
   - [ ] Steel 1
-    - [ ] Iron 4      => 4  => 8    =>  16  =>   32 =>   64
-- [ ] Light Material 4
+    - [ ] Iron 4       => 4  => 8   =>  16  =>  32 =>   64
+
+- [ ] Light Material 4    4     8       16      32      64
   - [ ] Carbon Alloy 4
      - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512
      - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512
-- [ ] Heavy Plating 4
+
+- [ ] Heavy Plating 4      4    8       16      32      64
   - [ ] Carbon Alloy 16
      - [ ] Iron 4      => 64 => 256 => 512  => 1024 => 2048
      - [ ] Carbon 4    => 64 => 256 => 512  => 1024 => 2048
   - [ ] Thermal Pipe
-     - [ ] Copper 4    => 4  => 16  =>  32  => 64   =>  128  Cu
+     - [ ] Copper 4    => 4  => 8  =>  16  =>  32   =>  128  Cu
