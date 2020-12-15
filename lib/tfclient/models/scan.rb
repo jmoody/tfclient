@@ -53,24 +53,25 @@ module TFClient
         end
       end
 
-      # def response
-      #   table = TTY::Table.new(header: [
-      #     {value: @owner.translation, alignment: :center},
-      #     {value: @outfit_space.translation, alignment: :center},
-      #     {value: @shield_charge.translation, alignment: :center}
-      #   ])
-      #
-      #   table << [@owner.username,
-      #             @outfit_space.value,
-      #             @shield_charge.value]
-      #   table.render(:ascii, padding: [0,2,0,2],
-      #                width: Models::TABLE_WIDTH, resize: true) do |renderer|
-      #     renderer.alignments= [:center, :center, :center]
-      #   end
-      #
-      #   puts @outfits.to_s
-      #   puts @cargo.to_s
-      # end
+      def response
+        table = TTY::Table.new(header: [
+          {value: @owner.translation, alignment: :center},
+          {value: @outfit_space.translation, alignment: :center},
+          {value: @shield_charge.translation, alignment: :center}
+        ])
+
+        table << [@owner.username,
+                  @outfit_space.value,
+                  @shield_charge.value]
+        puts table.render(:ascii, padding: [0,2,0,2],
+                          width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:center, :center, :center]
+        end
+
+
+        puts @outfits.to_s
+        puts @cargo.to_s
+      end
     end
 
     class Owner < Model
@@ -143,20 +144,22 @@ module TFClient
         table = TTY::Table.new(header: [
           "#{@translation}: #{slots_used}/#{@max_slots} slots",
           {value: "name", alignment: :center},
-          {value: "setting", alignment: :center}
+          {value: "setting", alignment: :center},
+          {value: "index", alignment: :center}
         ])
 
         @items.each do |item|
           table << [
-            "     [#{item[:index]}]",
+            "[#{item[:index]}]",
             "#{item[:name]} (#{item[:mark].to_roman})",
-            item[:setting]
+            item[:setting],
+            "[#{item[:index]}]"
           ]
         end
 
-        table.render(:ascii, padding: [0,2,0,2],
+        table.render(:ascii, padding: [0,1,0,1],
                      width: Models::TABLE_WIDTH, resize: true) do |renderer|
-          renderer.alignments= [:right, :right, :center]
+          renderer.alignments= [:right, :right, :center, :center]
         end
       end
 
@@ -191,7 +194,8 @@ module TFClient
         table = TTY::Table.new(header: [
           "#{@translation}: weight #{weight}",
           {value: "cargo", alignment: :center},
-          {value: "amount", alignment: :center}
+          {value: "amount", alignment: :center},
+          {value: "index", alignment: :center}
         ])
 
         @items.each do |item|
@@ -200,12 +204,15 @@ module TFClient
           if mark && (mark != 0)
             name = "#{name} (#{mark.to_roman})"
           end
-          table << ["     [#{item[:index]}]", name, item[:count]]
+          table << ["[#{item[:index]}]",
+                    name,
+                    item[:count],
+                    "[#{item[:index]}]"]
         end
 
-        table.render(:ascii, padding: [0,2,0,2],
+        table.render(:ascii, padding: [0,1,0,1],
                      width: Models::TABLE_WIDTH, resize: true) do |renderer|
-          renderer.alignments= [:right, :right, :center]
+          renderer.alignments= [:right, :right, :center, :center]
         end
       end
 

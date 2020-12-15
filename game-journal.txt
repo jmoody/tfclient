@@ -21,7 +21,7 @@ Nibiru
 12,20 Fe 1, B 53 - None
 10,21 Si 2, B 201 - None
 12,21 C 2, B 140 - None
-12,22 C 5, B 11 - None
+12,22 C 5, B 11 - None [ne, n] <= [s, sw]
 11,23 U 6, B 63 - 0 Barren
 18,16 Si 7, B 9 - Barren, Frozen
 18,15 Cu 6, B 50 - Greenhouse, Gas, Barren
@@ -91,20 +91,20 @@ Living Spaces
   - [x] Iron 4         => 128
 
 Shipyard
-                                II      III     IV      V
-- [x] Controller 2              4        8      16      32
+                                II      III     IV      V     VII
+- [x] Controller 2              4        8      16      32     64
   - [ ] Silicon 2      => 2  => 4   =>   8  =>  16 =>   32
   - [ ] Steel 1
     - [ ] Iron 4       => 4  => 8   =>  16  =>  32 =>   64
 
-- [ ] Light Material 4    4     8       16      32      64
+- [x] Light Material 4    4     8       16      32      64    128
   - [ ] Carbon Alloy 4
      - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512
      - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512
 
-- [ ] Heavy Plating 4      4    8       16      32      64
+- [ ] Heavy Plating 4      4    8       16      32      64    128
   - [ ] Carbon Alloy 16
      - [ ] Iron 4      => 64 => 256 => 512  => 1024 => 2048
      - [ ] Carbon 4    => 64 => 256 => 512  => 1024 => 2048
-  - [ ] Thermal Pipe
+  - [ ] Thermal Pipe 2 => 2 => 8  =>   16 => 32 => 64 => 128
      - [ ] Copper 4    => 4  => 8  =>  16  =>  32   =>  128  Cu

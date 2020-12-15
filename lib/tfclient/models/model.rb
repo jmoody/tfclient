@@ -3,7 +3,7 @@ module TFClient
   module Models
     require "cousin_roman"
 
-    TABLE_WIDTH = 65.freeze
+    TABLE_WIDTH = 80.freeze
 
     class Response
       attr_accessor :lines, :response
