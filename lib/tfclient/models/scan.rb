@@ -158,8 +158,7 @@ module TFClient
           ]
         end
 
-        table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:right, :right, :center, :center]
         end
       end
@@ -211,8 +210,7 @@ module TFClient
                     "[#{item[:index]}]"]
         end
 
-        table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:right, :right, :center, :center]
         end
       end

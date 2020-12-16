@@ -36,7 +36,6 @@ module TFClient
         "nw" => 7
       }
 
-
       LABELS = [
         "Coordinates",
         "Claimed by",
@@ -89,11 +88,9 @@ module TFClient
           "#{@coordinates}"]
         ])
 
-        puts table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        puts table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:left, :center, :right]
         end
-
 
         puts @structures
       end
@@ -203,8 +200,7 @@ module TFClient
           ]
         end
 
-        table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:right, :right, :center, :center, :center, :center]
         end
       end
@@ -252,8 +248,7 @@ module TFClient
           ]
         end
 
-        table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:right, :right, :center, :center, :center]
         end
       end
@@ -292,8 +287,7 @@ module TFClient
           table << ["[#{item[:id]}]", item[:name], item[:type], "[#{item[:id]}]"]
         end
 
-        table.render(:ascii, padding: [0,1,0,1],
-                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
           renderer.alignments= [:right, :right, :center, :center]
         end
       end

@@ -3,7 +3,7 @@ module TFClient
   module Models
     require "cousin_roman"
 
-    TABLE_WIDTH = 80.freeze
+    TABLE_OPTIONS = { padding: [0,1,0,1], width: 80, resize: true }
 
     class Response
       attr_accessor :lines, :response
