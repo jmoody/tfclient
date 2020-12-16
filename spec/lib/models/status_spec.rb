@@ -7,20 +7,23 @@ RSpec.describe TFClient::Models::Status do
 
   context ".cooling_status_from_line" do
     it "returns a status from a stable line" do
-      line = "	Cooling status: Stable| Cooling status: Stabil"
-      actual = described_class.cooling_status_from_line(line: line)
-      expect(actual).to be == "Stabil"
+      lines = ["	Cooling status: Stable| Kühlstatus: Stabil"]
+      actual = described_class.status_from_lines(lines: lines,
+                                                 start_with: "Cooling status")
+      expect(actual).to be == "Kühlstatus: Stabil"
     end
 
     it "returns a status from an overheated line" do
-      line = "	Cooling status: OVERHEATED|     Cooling status: Überhitzt"
-      actual = described_class.cooling_status_from_line(line: line)
-      expect(actual).to be == "Überhitzt"
+      lines = ["	Cooling status: OVERHEATED|     Kühlstatus: Überhitzt"]
+      actual = described_class.status_from_lines(lines: lines,
+                                                 start_with: "Cooling status")
+      expect(actual).to be == "Kühlstatus: Überhitzt"
     end
 
     it "returns a status from an overheating in N seconds line" do
-      line = "	Cooling status: Overheat in {remaining} seconds!|       Cooling status: Überhitzung in {remaining} Sekunden!|remaining=46"
-      actual = described_class.cooling_status_from_line(line: line)
+      lines = ["	Cooling status: Overheat in {remaining} seconds!|       Cooling status: Überhitzung in {remaining} Sekunden!|remaining=46"]
+      actual = described_class.status_from_lines(lines: lines,
+                                                 start_with: "Cooling status")
       expect(actual).to be == "Überhitzung in 46 Sekunden!"
     end
   end
@@ -35,8 +38,16 @@ RSpec.describe TFClient::Models::Status do
     expect(status.heat).to be == 11
     expect(status.max_heat).to be == 60
     expect(status.heat_rate).to be == -3.0
+    expect(status.cooling_status).to be == "Kühlstatus: Stabil"
+
+    expect(status.energy).to be == 22
+    expect(status.max_energy).to be == 120
+    expect(status.energy_rate).to be == 5.0
   end
 
+  it "returns antigravity engine information" do
+    expect(status.antigravity_engine_status).to be == "Antigravitationsmotoren: Activ"
+  end
 
   context "General" do
 

@@ -6,7 +6,7 @@ mass: 26.000000
 outfit_space: 0.000000
 heat_rate: -3.000000
 max_heat: 60.000000
-energy_rate: -3.000000
+energy_rate: 5.000000
 max_energy: 120.000000
 shield_rate: 0.000000
 max_shield: 60.000000
@@ -47,15 +47,15 @@ General:|General:
 	Heat: {heat}/{max}|     Heat: {heat}/{max}|heat=0|max=60
 	Energy: {energy}/{max}| Energy: {energy}/{max}|energy=0|max=120
 Stability:|Stability:
-	Cooling status: Stable| Cooling status: Stable
+	Cooling status: Stable| Kühlstatus: Stabil
 	Net heat generation: {heat_rate}/s|     Net heat generation: {heat_rate}/s|heat_rate=-2.1
-	Power status: Stable|   Power status: Stable
+	Power status: Stable|   Stromstatus: Stabil
 	Net energy consumption: {energy_rate}/s|        Net energy consumption: {energy_rate}/s|energy_rate=-1.1
 Fuel:|Fuel:
 	[{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|    [{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|index=0|name=Fusion Reactor|mark=1|remaining=57455
 	[{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|    [{index}] {name} mark {mark}: {remaining} seconds of fuel remaining|index=2|name=Distribution Center|mark=1|remaining=146921
 Shields: Regenerating at {rate}/s ({shield}/{max})|Shields: Regenerating at {rate}/s ({shield}/{max})|shield=24|max=60|rate=0.2
 Warp engines: Charging ({charge}%)|Warp engines: Charging ({charge}%)|charge=25
-Antigravity engines: Online|Antigravity engines: Online
+Antigravity engines: Online|Antigravitationsmotoren: Activ
 Mining progress: {progress}% ({interval} second interval)|Mining progress: {progress}% ({interval} second interval)|progress=22|interval=560.0
 Colonists: {crew}|Colonists: {crew}|crew=512

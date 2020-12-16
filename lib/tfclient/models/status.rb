@@ -4,22 +4,27 @@ module TFClient
 
     class Status < Response
 
-      def self.cooling_status_from_line(line:)
-        stripped = line.strip
-        if !stripped.start_with?("Cooling status:")
-          raise "expected line to be a cooling status line, found: #{line}"
+      def self.status_from_lines(lines:, start_with:)
+        stripped = lines.map { |line| line.strip }
+        prefix = start_with.strip
+        line, _ = ResponseParser.line_and_index_for_beginning_with(lines: stripped,
+                                                                   string: prefix)
+        if !line.start_with?(prefix)
+          raise "expected line to be a status line for #{prefix} in #{lines}"
         end
 
-        tokens = ResponseParser.tokenize_line(line: stripped)
+        tokens = ResponseParser.tokenize_line(line: line)
 
         if tokens.size == 2 || tokens.size == 3
-          translation = tokens[1].strip.split(": ")[1]
+          translation = tokens[1]
 
           return translation if tokens.size == 2
 
-          translation = ResponseParser.substitute_line_values(line: stripped)
-          translation.split(": ")[1]
+          translation = ResponseParser.substitute_line_values(line: line)
+          return translation.split(": ")[1]
         end
+
+        raise "Expected 2 or 3 pipe (|) delimited tokens, but found: #{tokens.size} in line: #{line}"
       end
 
       LINE_IDENTIFIERS = [
@@ -63,37 +68,17 @@ module TFClient
         @max_heat = @status_report.hash[:max_heat].to_i
         @heat_rate = @status_report.hash[:heat_rate].to_f
 
-        cooling_space_line = lines.detect do |line|
-          line.strip.start_with?("Cooling status")
-        end
+        @cooling_status = Status.status_from_lines(lines: lines,
+                                                   start_with: "Cooling status")
 
-        hash = ResponseParser.hash_from_line_values(line: outfit_space_line)
+        @energy = @status_report.hash[:energy].to_i
+        @max_energy = @status_report.hash[:max_energy].to_i
+        @energy_rate = @status_report.hash[:energy_rate].to_f
 
+        line, _ = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                   string: "Antigravity engines")
 
-
-
-        # LINE_IDENTIFIER.each_with_index do |label, label_index|
-        #   var_name = ResponseParser.snake_case_sym_from_string(string: label)
-        #   class_name = ResponseParser.camel_case_from_string(string: label)
-        #
-        #   clazz = ResponseParser.model_class_from_string(string: class_name)
-        #   if clazz.nil?
-        #     raise "could not find class name: #{class_name}"
-        #   end
-        #
-        #   line, _ = ResponseParser.line_and_index_for_beginning_with(lines: @lines,
-        #                                                              string: label)
-        #
-        #   next if line.nil?
-        #
-        #   if label_index < 4
-        #     var = clazz.new(line: line)
-        #   else
-        #     var = clazz.new(lines: @lines)
-        #   end
-        #
-        #   instance_variable_set("@#{var_name}", var)
-        # end
+        @antigravity_engine_status = ResponseParser.tokenize_line(line: line)[1]
       end
     end
   end

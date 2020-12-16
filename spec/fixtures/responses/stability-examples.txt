@@ -2,14 +2,14 @@ BEGIN Power Brownout
 Stability:|Stability:
 	Cooling status: Stable| Cooling status: Stable
 	Net heat generation: {heat_rate}/s|     Net heat generation: {heat_rate}/s|heat_rate=0.0
-	Power status: BROWNOUT| Power status: BROWNOUT
+	Power status: BROWNOUT| Stromstatus: Stromausfall
 	Net energy consumption: {energy_rate}/s|        Net energy consumption: {energy_rate}/s|energy_rate=0.0
 END
 BEGIN Power Brownout in N seconds
 Stability:|Stability:
 	Cooling status: Stable| Cooling status: Stabil
 	Net heat generation: {heat_rate}/s|     Net heat generation: {heat_rate}/s|heat_rate=-1.5
-	Power status: Brownout in {remaining} seconds!| Power status: Brownout in {remaining} seconds!|remaining=11
+	Power status: Brownout in {remaining} seconds!| Stromstatus: Stromausfall in {remaining} Sekunden!|remaining=11
 	Net energy consumption: {energy_rate}/s|        Net energy consumption: {energy_rate}/s|energy_rate=2.0
 END
 BEGIN Overheated
