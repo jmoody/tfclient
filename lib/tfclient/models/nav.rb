@@ -36,7 +36,7 @@ module TFClient
         "nw" => 7
       }
 
-      LABELS = [
+      LINE_IDENTIFIER = [
         "Coordinates",
         "Claimed by",
         "Brightness",
@@ -52,7 +52,7 @@ module TFClient
       def initialize(lines:)
         super(lines: lines)
 
-        LABELS.each_with_index do |label, label_index|
+        LINE_IDENTIFIER.each_with_index do |label, label_index|
           var_name = ResponseParser.snake_case_sym_from_string(string: label)
           class_name = ResponseParser.camel_case_from_string(string: label)
 
@@ -64,7 +64,6 @@ module TFClient
           line, _ = ResponseParser.line_and_index_for_beginning_with(lines: @lines,
                                                                      string: label)
 
-          # Claimed by is not always present
           next if line.nil?
 
           if label_index < 4

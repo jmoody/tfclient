@@ -23,3 +23,7 @@ task :server do
   sh "docker-compose up --build --remove-orphans --detach"
 end
 
+task :socat do
+  sh "socat readline ssl:localhost:10000,verify=0"
+end
+

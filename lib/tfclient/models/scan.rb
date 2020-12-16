@@ -5,8 +5,7 @@ module TFClient
     class Scan < Response
       LINE_IDENTIFIERS = [
         "Owner",
-        # Not interesting - at least not yet
-        #"Operators",
+        "Operators",
         "Outfit space",
         "Shield charge",
         "Outfits",
@@ -44,12 +43,14 @@ module TFClient
             var = clazz.new(line: line)
           elsif ["Outfits", "Cargo"].include?(line_id)
             var = clazz.new(lines: @lines)
+            if var.is_a?(TFClient::Models::Outfits)
+              var.max_slots = @outfit_space.value
+            end
           else
             raise "Cannot find class initializer for: #{line_id}"
           end
 
           instance_variable_set("@#{var_name}", var)
-          @response << var.to_s
         end
       end
 
@@ -135,10 +136,7 @@ module TFClient
           setting = hash[:setting].to_i
           { index: index, name: name, mark: mark, setting: setting}
         end
-
-        # TODO maybe pass as an argument or set after initialization
-        # TODO The max number of slots is in the OutfitSpace object
-        @max_slots = 8
+        @max_slots = 0
       end
 
       def to_s
