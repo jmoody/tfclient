@@ -29,11 +29,11 @@ created_at: 1606327847.000000
 name: ydoomj's Ship
 type: ship
 total_outfit_space: 8
-heat: 0.000000
-energy: 0.000000
-shield: 0.000000
-warp_charge: 0.000000
-mining_progress: 0.000000
+heat: 11.000000
+energy: 22.000000
+shield: 33.000000
+warp_charge: 44.000000
+mining_progress: 55.000000
 sys_id: 0
 asteroid_type: Copper Ore
 asteroid_richness: 2
@@ -43,7 +43,7 @@ targets_size: 0
 STATUSREPORT END
 General:|General:
 	Mass: {mass}|   Mass: {mass}|mass=26
-	Outfit space: {space}/{total}|  Outfit space: {space}/{total}|space=0|total=8
+	Outfit space: {space}/{total}|  Outfit space: {space}/{total}|space=2|total=8
 	Heat: {heat}/{max}|     Heat: {heat}/{max}|heat=0|max=60
 	Energy: {energy}/{max}| Energy: {energy}/{max}|energy=0|max=120
 Stability:|Stability:

@@ -4,8 +4,8 @@ A command-line client for the TextFlight.
 
 TextFlight is a space-based text adventure MMO.
 
-https://leagueh.xyz/tf/
-https://leagueh.xyz/git/textflight/
+* https://leagueh.xyz/tf/
+* https://leagueh.xyz/git/textflight/
 
 ```
 # TextFlight character
