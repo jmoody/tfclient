@@ -36,14 +36,6 @@ module TFClient
         "nw" => 7
       }
 
-      # 7 # 0: 315 degrees, X=-1, Y=-1 (northwest)
-      # 0 # 1: 0 degrees, X=0, Y=-1 (north)
-      # 1 # 2: 45 degrees, X=1, Y=-1 (northeast)
-      # 6 # 3: 270 degrees, X=-1, Y=0 (west)
-      # 2 # 4: 90 degrees, X=1, Y=0 (east)
-      # 5 # 5: 225 degrees, X=-1, Y=1 (southwest)
-      # 4 # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
-      # 3 # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
 
       LABELS = [
         "Coordinates",
@@ -83,8 +75,27 @@ module TFClient
           end
 
           instance_variable_set("@#{var_name}", var)
-          @response << var.to_s
+          #@response << var.to_s
         end
+      end
+
+      def response
+        puts @planets
+
+        puts @links
+        table = TTY::Table.new(rows: [[
+          "#{@brightness.to_s}",
+          "#{@asteroids.to_s}",
+          "#{@coordinates}"]
+        ])
+
+        puts table.render(:ascii, padding: [0,1,0,1],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:left, :center, :right]
+        end
+
+
+        puts @structures
       end
 
       def to_s
@@ -175,24 +186,26 @@ module TFClient
 
       def to_s
         table = TTY::Table.new(header: [
-          "#{@translation}:",
+          {value: "#{@translation}", alignment: :right},
           {value: "drag", alignment: :center},
           {value: "faction", alignment: :center},
-          {value: "index", alignment: :center}
+          {value: "original", alignment: :center},
+          {value: "direction", alignment: :center}
         ])
 
         @items.each do |item|
           table << [
-            "     #{item[:direction]}",
+            "#{item[:direction]}",
             item[:drag],
             item[:faction],
-            "[#{item[:index]}]"
+            "[#{item[:index]}]",
+            "#{item[:direction]}"
           ]
         end
 
-        table.render(:ascii, padding: [0,2,0,2],
+        table.render(:ascii, padding: [0,1,0,1],
                      width: Models::TABLE_WIDTH, resize: true) do |renderer|
-          renderer.alignments= [:right, :right, :center, :center]
+          renderer.alignments= [:right, :right, :center, :center, :center, :center]
         end
       end
     end
@@ -220,34 +233,37 @@ module TFClient
       end
 
       def to_s
+        return "" if @items.empty?
         table = TTY::Table.new(header: [
-          "#{@translation}",
+          {value: "#{@translation}", alignment: :right},
           {value: "type", alignment: :center},
           {value: "name", alignment: :center},
-          {value: "faction", alignment: :center}
+          {value: "faction", alignment: :center},
+          {value: "index", alignment: :center}
         ])
 
         @items.each do |item|
           table << [
-            "          [#{item[:index]}]",
+            "[#{item[:index]}]",
             item[:type],
             item[:name],
-            item[:faction]
+            item[:faction],
+            "[#{item[:index]}]"
           ]
         end
 
-        table.render(:ascii, padding: [0,2,0,2],
-                     width: Models::TABLE_WIDTH) do |renderer|
-          renderer.alignments= [:right, :right, :center, :center]
+        table.render(:ascii, padding: [0,1,0,1],
+                     width: Models::TABLE_WIDTH, resize: true) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center, :center]
         end
       end
     end
 
     class Structures < ModelWithItems
 
-      def initialize(lines:)
-        line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                       string: "Structures")
+        def initialize(lines:)
+          line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                         string: "Structures")
         super(line: line)
 
         items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
@@ -266,18 +282,19 @@ module TFClient
 
       def to_s
         table = TTY::Table.new(header: [
-          "#{@translation}:",
+          {value: "#{@translation}", alignment: :right},
           {value: "name", alignment: :center},
-          {value: "ship class", alignment: :center}
+          {value: "ship class", alignment: :center},
+          {value: "id", alignment: :center }
         ])
 
         @items.each do |item|
-          table << ["     [#{item[:id]}]", item[:name], item[:type]]
+          table << ["[#{item[:id]}]", item[:name], item[:type], "[#{item[:id]}]"]
         end
 
-        table.render(:ascii, padding: [0,2,0,2],
+        table.render(:ascii, padding: [0,1,0,1],
                      width: Models::TABLE_WIDTH, resize: true) do |renderer|
-          renderer.alignments= [:right, :right, :center]
+          renderer.alignments= [:right, :right, :center, :center]
         end
       end
     end

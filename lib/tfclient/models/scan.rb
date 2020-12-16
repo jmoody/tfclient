@@ -54,20 +54,21 @@ module TFClient
       end
 
       def response
-        table = TTY::Table.new(header: [
-          {value: @owner.translation, alignment: :center},
-          {value: @outfit_space.translation, alignment: :center},
-          {value: @shield_charge.translation, alignment: :center}
-        ])
-
-        table << [@owner.username,
-                  @outfit_space.value,
-                  @shield_charge.value]
-        puts table.render(:ascii, padding: [0,2,0,2],
-                          width: Models::TABLE_WIDTH, resize: true) do |renderer|
-          renderer.alignments= [:center, :center, :center]
-        end
-
+        # TODO this is interesting only when you scan _other_ structures
+        # table = TTY::Table.new(header: [
+        #   {value: @owner.translation, alignment: :center},
+        #   {value: @outfit_space.translation, alignment: :center},
+        #   {value: @shield_charge.translation, alignment: :center}
+        # ])
+        #
+        # table << [@owner.username,
+        #           @outfit_space.value,
+        #           @shield_charge.value]
+        #
+        # puts table.render(:ascii, padding: [0,1,0,1],
+        #                   width: Models::TABLE_WIDTH, resize: true) do |renderer|
+        #   renderer.alignments= [:center, :center, :center]
+        # end
 
         puts @outfits.to_s
         puts @cargo.to_s
@@ -192,7 +193,7 @@ module TFClient
 
       def to_s
         table = TTY::Table.new(header: [
-          "#{@translation}: weight #{weight}",
+          "Weight: #{weight}",
           {value: "cargo", alignment: :center},
           {value: "amount", alignment: :center},
           {value: "index", alignment: :center}

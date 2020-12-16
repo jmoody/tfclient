@@ -164,16 +164,16 @@ module TextFlight
                                    response: response).parse
     end
 
-    attr_reader :socket, :user, :pass, :host, :port, :ssl, :state, :dev
+    attr_reader :socket, :user, :pass, :host, :port, :tcp, :state, :dev
 
-    def initialize(host:, port:, ssl:, user:, pass:, dev:)
+    def initialize(host:, port:, tcp:, user:, pass:, dev:)
       @state = { }
       @user = user
       @pass = pass
       @host = host
       @port = port
-      @ssl = ssl
-      @socket = connect(host: @host, port: @port, ssl: @ssl, dev: dev)
+      @tcp = tcp
+      @socket = connect(host: @host, port: @port, tcp: @tcp, dev: dev)
       TextFlight::CLI.read_response(socket: @socket)
       TextFlight::CLI.register(socket: @socket, user: @user, pass: @pass)
       TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
@@ -182,15 +182,18 @@ module TextFlight
       status_report = TextFlight::CLI.status(socket: @socket)
       nav = TextFlight::CLI.nav(socket: @socket)
 
-      @prompt = TFClient::TFPrompt.new(status_report: status_report)
+      @prompt = TFClient::TFPrompt.new(operator: @user,
+                                       status_report: status_report)
       @prompt.x = nav.coordinates.x
       @prompt.y = nav.coordinates.y
       read_eval_print
     end
 
-    def connect(host:, port:, ssl:, dev:)
-      puts "try to connect to #{host}:#{port} with ssl = #{ssl}"
-      if ssl
+    def connect(host:, port:, tcp:, dev:)
+      puts "try to connect to #{host}:#{port} with #{tcp ? "tcp" : "ssl"}"
+      if tcp
+        socket = TCPSocket.new(host, port)
+      else
         ssl_context = OpenSSL::SSL::SSLContext.new
         if dev
           ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -199,8 +202,6 @@ module TextFlight
         socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
         socket.sync_close = true
         socket.connect
-      else
-        socket = TCPSocket.new(host, port)
       end
       socket
     end
@@ -230,7 +231,8 @@ module TextFlight
                                                   response: response).parse
           if instance.is_a?(TFClient::Models::StatusReport)
             @prompt.mass = instance.hash[:mass].to_i
-            @prompt.warp_charge = instance.hash[:warp_charge].to_i
+            @prompt.warp_charge = instance.hash[:warp_charge]
+            @prompt.shield_charge = instance.hash[:shield]
           end
 
           if instance.is_a?(TFClient::Models::Nav)
@@ -251,10 +253,10 @@ require "dotenv/load" # load from .env
 require "tfclient"
 
 env = ARGV.include?("--dev") ? "DEV" : "TF"
-ssl = ARGV.include?("--ssl")
+tcp = ARGV.include?("--tcp")
 host = ENV["#{env}_HOST"] || "localhost"
 port = ENV["#{env}_PORT"] || "10000"
 user = ENV["#{env}_USER"] || "abc"
 pass = ENV["#{env}_PASS"] || "1234"
 
-TextFlight::CLI.new(host: host, port: port, ssl: ssl, user: user, pass: pass, dev: env == "DEV")
+TextFlight::CLI.new(host: host, port: port, tcp: tcp, user: user, pass: pass, dev: env == "DEV")
