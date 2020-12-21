@@ -1,0 +1,6 @@
+# Shield regenerating
+Shields: Regenerating at {rate}/s ({shield}/{max})|Schilde: Regenerieren bei {rate}/s ({shield}/{max})|shield=24|max=60|rate=0.2
+# Shield Online
+Shields: Online|Schilde: Bereit
+# Shields failed
+Shields: FAILED|Schilde: Gescheitert

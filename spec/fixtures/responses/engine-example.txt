@@ -1,0 +1,6 @@
+# Engines ready
+Warp engines: Ready to engage|Warp-Motoren: Bereit zum Einschalten
+# Engines charging
+Warp engines: Charging ({charge}%)|Warp-Motoren: Aufladen ({charge}%)|charge=97
+# Engines Brownout
+Warp engines: BROWNOUT|Warp-Motoren: Überladen

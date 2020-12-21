@@ -16,3 +16,4 @@ Outfits:|Geräte:
 Cargo:|Fracht:
 	[{index}] {name} x{count}|      [{index}] {name} x{count}|index=0|name=Hydrogen Fuel Cell|count=8
 	[{index}] {name} ({extra}) x{count}|    [{index}] {name} ({extra}) x{count}|index=1|name=Crate|extra=2|count=3
+	[{index}] {name} ({extra}) x{count}|    [{index}] {name} ({extra}) x{count}|index=4|name=Living Spaces|extra=14|count=1

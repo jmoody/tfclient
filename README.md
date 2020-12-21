@@ -4,8 +4,8 @@ A command-line client for the TextFlight.
 
 TextFlight is a space-based text adventure MMO.
 
-https://leagueh.xyz/tf/
-https://leagueh.xyz/git/textflight/
+* https://leagueh.xyz/tf/
+* https://leagueh.xyz/git/textflight/
 
 ```
 # TextFlight character
@@ -22,15 +22,18 @@ Amherst.  I played way too much BatMUD in the early nineties and early 2000s.
 
 I develop and test on macOS.  The GitHub Actions run rspec tests on Ubuntu.
 
-* Ruby >= 2.7.0
+I install dependencies with Homebrew.
 
-`socat` is essential for debugging - I installed this with brew.
+* Ruby >= 2.7.0
+* sqlite3
+* readline
+* socat (essential for debugging)
 
 ### Developing
 
 To run integration tests and debug, a TextFlight server needs to be running
 locally.  There are two options: building the server yourself or using the
-docker container.  Find the instructions for building it yourself at the
+docker container.  Find the instructions for building the server yourself at the
 bottom of this document.
 
 #### Docker
@@ -44,11 +47,19 @@ docker-compose up --build --remove-orphans
 ssl_1  | 2020-12-09 06:48:58,318 INFO:Loaded quest 'Refueling'.
 ssl_1  | 2020-12-09 06:48:58,318 INFO:Loaded quest 'Base Building'.
 ssl_1  | 2020-12-09 06:48:58,319 INFO:Loaded quest 'Starting Colonies'.
+```
 
-# The certificate is self-signed, so the client should not try to
-# verify the Certificate Authority.
+
+The certificate is self-signed, so the client should not try to verify the
+Certificate Authority.
+
+```
+# Connect to the native client: socat
 $ socat readline ssl:localhost:10000,verify=0
 
+^ also a rake task: bundle exec rake socat
+
+# Connect with bin/client.rb
 # --dev flag turns off certificate validation.
 $ bundle exec bin/client.rb --dev
 ```
@@ -70,20 +81,17 @@ $ bundle  exec spec/integration
 
 ### TODO
 
-- [x] setup textflight.conf
-- [x] send 'language client'
-- [x] if we send commands too fast, the socket buffer fills and the server cannot respond
-- [x] we need a way of reading until there is no more output.  a non-blocking read on the socket
-- [x] stand up OpenSSL server locally -- broke?
-- [x] consolidate special case read_response methods into one method. WOOT!
-- [x] ask about WARNING:EOF occurred in violation of protocol (_ssl.c:1122) in IRC
-     * possibly send EOT `\004'`
-- [x] setup docker
-- [x] setup dotenv
 - [ ] stand up thor to improve cli
-- [ ] add a logger to client
-- [ ] control logger with ENV / cli
-- [ ] submit changes to upstream server
+- [ ] improve 'set' command
+  - engines {off | on}
+  - mining {off | on}
+  - prepare to launch
+  - prepare to land
+- [ ] improve the prompt
+- [ ] run 'nav' automatically after jump
+- [ ] handle the craft response
+- [ ] improve craft command (craft all [recipe])
+- [ ] improve the load command (mv all <index> to <structure>)
 
 ### Server
 
@@ -147,6 +155,6 @@ $ src/main.py
 $ socat readline ssl:localhost:10000,verify=0
 
 # Or with this client
-$ bin/client.rb --ssl --dev
+$ bin/client.rb --dev
 ```
 

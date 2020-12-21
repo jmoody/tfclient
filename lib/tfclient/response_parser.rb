@@ -3,6 +3,35 @@ module TFClient
   class ResponseParser
 
     FIELD_DELIMITER = "|".freeze
+    VARIABLE_REGEX = /(\{[a-z_]+\}+)/.freeze
+
+    def self.substitute_line_values(line:)
+      return line.chomp if !line[/\|/]
+      tokens = line.chomp.split("|")
+
+      translation = tokens[1]
+
+      matches = translation.scan(VARIABLE_REGEX)
+
+      return translation  if matches.empty?
+
+      values = self.hash_from_line_values(line: line.chomp)
+
+      with_substitutes = translation.chomp
+
+      matches.each do |match|
+        key = match[0].sub("{", "").sub("}", "").to_sym
+        with_substitutes.gsub!(match[0], values[key])
+      end
+
+      with_substitutes
+    end
+
+    def self.substitute_values(lines:)
+      lines.map do |line|
+        self.substitute_line_values(line:line.chomp)
+      end
+    end
 
     def self.tokenize_line(line:)
       lines = line.split(FIELD_DELIMITER)
@@ -90,35 +119,82 @@ module TFClient
     end
 
     attr_reader :command
+    attr_reader :textflight_command
     attr_reader :response
     attr_reader :lines
 
-    def initialize(command:, response:)
+    def initialize(command:, textflight_command:, response:)
       @command = command
+      @textflight_command = textflight_command
       @response = response
     end
 
     def parse
       @lines = @response.lines(chomp: true).reject { |line| line.length == 0 }
-      case command
+      case @textflight_command
       when "nav"
-        return parse_nav
+        parse_nav(command: @command)
       when "scan"
-        return parse_nav
+        parse_scan
+      when "status"
+        parse_status(command: @command)
       else
-        return lines.join("\n")
+        if @response[/#{Models::STATUS_BEGIN}/]
+          @response = @lines[0].chomp
+          @lines = [@response]
+        end
+
+        puts ResponseParser.substitute_values(lines: @lines).join("\n")
       end
     end
 
-    def parse_nav
+    def parse_nav(command:)
       nav = TFClient::Models::Nav.new(lines: lines)
-
-      puts nav.response
+      if command != "nav-for-prompt"
+        puts nav.response
+      end
+      nav
     end
 
     def parse_scan
       scan = TFClient::Models::Scan.new(lines: lines)
       puts scan.response
+      scan
+    end
+
+    def parse_status(command:)
+      if command == "status-for-prompt"
+        TFClient::Models::Status.new(lines: lines)
+      else
+        _, index_start =
+          ResponseParser.line_and_index_for_beginning_with(
+            lines: @lines,
+            string: Models::STATUS_BEGIN
+          )
+        if index_start == -1
+          puts ResponseParser.substitute_values(lines: @lines).join("\n")
+        end
+
+        _, index_end =
+          ResponseParser.line_and_index_for_beginning_with(
+            lines: @lines,
+            string: Models::STATUS_END
+          )
+
+        if index_start != 0
+          lines_before_status = @lines[0..index_start - 1]
+          puts ResponseParser.substitute_values(
+            lines: lines_before_status
+          ).join("\n")
+        else
+          lines_after_status = @lines[index_end + 1..-1]
+          puts ResponseParser.substitute_values(
+            lines: lines_after_status
+          ).join("\n")
+
+          Models::StatusReport.new(lines: @lines[index_start...index_end])
+        end
+      end
     end
   end
 end

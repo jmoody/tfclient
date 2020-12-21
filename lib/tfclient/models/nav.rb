@@ -36,16 +36,7 @@ module TFClient
         "nw" => 7
       }
 
-      # 7 # 0: 315 degrees, X=-1, Y=-1 (northwest)
-      # 0 # 1: 0 degrees, X=0, Y=-1 (north)
-      # 1 # 2: 45 degrees, X=1, Y=-1 (northeast)
-      # 6 # 3: 270 degrees, X=-1, Y=0 (west)
-      # 2 # 4: 90 degrees, X=1, Y=0 (east)
-      # 5 # 5: 225 degrees, X=-1, Y=1 (southwest)
-      # 4 # 6: 180 degrees, X=0, Y=-1 (south) # bug should be 0,1
-      # 3 # 7: 135 degrees, X=1, Y=-1 (southeast) # bug should be 1,1
-
-      LABELS = [
+      LINE_IDENTIFIER = [
         "Coordinates",
         "Claimed by",
         "Brightness",
@@ -61,7 +52,7 @@ module TFClient
       def initialize(lines:)
         super(lines: lines)
 
-        LABELS.each_with_index do |label, label_index|
+        LINE_IDENTIFIER.each_with_index do |label, label_index|
           var_name = ResponseParser.snake_case_sym_from_string(string: label)
           class_name = ResponseParser.camel_case_from_string(string: label)
 
@@ -73,7 +64,6 @@ module TFClient
           line, _ = ResponseParser.line_and_index_for_beginning_with(lines: @lines,
                                                                      string: label)
 
-          # Claimed by is not always present
           next if line.nil?
 
           if label_index < 4
@@ -83,8 +73,24 @@ module TFClient
           end
 
           instance_variable_set("@#{var_name}", var)
-          @response << var.to_s
         end
+      end
+
+      def response
+        puts @planets
+
+        puts @links
+        table = TTY::Table.new(rows: [[
+          "#{@brightness.to_s}",
+          "#{@asteroids.to_s}",
+          "#{@coordinates}"]
+        ])
+
+        puts table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
+          renderer.alignments= [:left, :center, :right]
+        end
+
+        puts @structures
       end
 
       def to_s
@@ -134,7 +140,7 @@ module TFClient
     end
 
     class Asteroids < Model
-      attr_reader :value, :ore, :density, :percent
+      attr_reader :ore, :density, :percent
 
       def initialize(line:)
         super(line: line)
@@ -149,7 +155,6 @@ module TFClient
     end
 
     class Links < ModelWithItems
-
       def initialize(lines:)
         line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
                                                                        string: "Links")
@@ -166,8 +171,7 @@ module TFClient
           # direction is WIP
           direction = Nav::GAME_LINK_TO_COMPASS_MAP[index.to_s]
           {
-            index: index, drag: drag, direction: direction, faction: faction,
-            string: %Q[#{direction}\t[#{index}] drag: #{drag}\t#{faction}].strip
+            index: index, drag: drag, direction: direction, faction: faction
           }
         end.sort do |a, b|
           Nav::COMPASS_ORDER[a[:direction]] <=> Nav::COMPASS_ORDER[b[:direction]]
@@ -175,10 +179,27 @@ module TFClient
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          {value: "#{@translation}", alignment: :right},
+          {value: "drag", alignment: :center},
+          {value: "faction", alignment: :center},
+          {value: "original", alignment: :center},
+          {value: "direction", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << [
+            "#{item[:direction]}",
+            item[:drag],
+            item[:faction],
+            "[#{item[:index]}]",
+            "#{item[:direction]}"
+          ]
+        end
+
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center, :center, :center]
+        end
       end
     end
 
@@ -200,24 +221,41 @@ module TFClient
           name = hash[:name]
           faction = hash[:faction]
 
-          { index: index, type: type, name: name, faction: faction,
-            string: %Q[\t[#{index}] #{type}\t#{name}\t#{faction}].strip }
+          { index: index, type: type, name: name, faction: faction }
         end
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        return "" if @items.empty?
+        table = TTY::Table.new(header: [
+          {value: "#{@translation}", alignment: :right},
+          {value: "type", alignment: :center},
+          {value: "name", alignment: :center},
+          {value: "faction", alignment: :center},
+          {value: "index", alignment: :center}
+        ])
+
+        @items.each do |item|
+          table << [
+            "[#{item[:index]}]",
+            item[:type],
+            item[:name],
+            item[:faction],
+            "[#{item[:index]}]"
+          ]
+        end
+
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center, :center]
+        end
       end
     end
 
     class Structures < ModelWithItems
 
-      def initialize(lines:)
-        line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                       string: "Structures")
+        def initialize(lines:)
+          line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
+                                                                         string: "Structures")
         super(line: line)
 
         items = ResponseParser.collect_list_items(lines: lines, start_index: index + 1)
@@ -228,16 +266,27 @@ module TFClient
 
           id = hash[:id].to_i
           name = hash[:name]
-          type = hash[:sclass]
-          { id: id, name: name, type: type, string: %Q[[#{id}]\t#{name} #{type ? type : ""}] }
+          # TODO: distinguish shipyards from bases
+          type = hash[:sclass] || "base"
+          { id: id, name: name, type: type }
         end
       end
 
       def to_s
-        <<~EOM
-          #{@translation}:
-          #{@items.map { |item| %Q[\t#{item[:string]}]}.join("\n")}
-        EOM
+        table = TTY::Table.new(header: [
+          {value: "#{@translation}", alignment: :right},
+          {value: "name", alignment: :center},
+          {value: "ship class", alignment: :center},
+          {value: "id", alignment: :center }
+        ])
+
+        @items.each do |item|
+          table << ["[#{item[:id]}]", item[:name], item[:type], "[#{item[:id]}]"]
+        end
+
+        table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
+          renderer.alignments= [:right, :right, :center, :center]
+        end
       end
     end
   end
