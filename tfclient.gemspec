@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |spec|
-  spec.name          = "tfclient"
+  spec.name          = "textflight-client"
   spec.version       =  begin
-    file = "#{File.expand_path(File.join(__dir__, "lib", "tfclient", "version.rb"))}"
+    file = "#{File.expand_path(File.join(__dir__, "lib", "textflight-client", "version.rb"))}"
     m = Module.new
     m.module_eval IO.read(file).force_encoding("utf-8")
     version = m::TFClient::VERSION

@@ -1,4 +1,4 @@
-require "tfclient"
+require "textflight-client"
 require "pry"
 require "stub_env"
 require "pry"

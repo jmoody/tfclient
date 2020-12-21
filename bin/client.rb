@@ -269,7 +269,7 @@ module TextFlight
 end
 
 require "dotenv/load" # load from .env
-require "tfclient"
+require "textflight-client"
 
 env = ARGV.include?("--dev") ? "DEV" : "TF"
 tcp = ARGV.include?("--tcp")

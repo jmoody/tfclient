@@ -24,8 +24,8 @@ options =
 
 guard(:rspec, options) do
   watch(%r{^spec/.+_spec\.rb$})
-  watch(%r{^lib/tfclient/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
-  watch("lib/tfclient.rb")  { "spec/lib" }
+  watch(%r{^lib/textflight-client/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch("lib/textflight-client.rb")  { "spec/lib" }
   watch("spec/spec_helper.rb")  { "spec/lib" }
   watch("spec/fixtures.rb")  { "spec/lib" }
 end

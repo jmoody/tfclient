@@ -9,7 +9,7 @@ end
 
 module TFClient::Models::Local
 
-  require_relative "../../tfclient/logging.rb"
+  require_relative "../../textflight-client/logging.rb"
   require "json"
 
   class Database
