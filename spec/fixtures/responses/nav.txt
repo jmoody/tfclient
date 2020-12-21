@@ -1,0 +1,19 @@
+Coordinates: {x},{y}|Koordinaten: {x},{y}|x=1|y=2
+Claimed by '{faction}'.|Beansprucht von '{faction}'.|faction=nibiru
+Brightness: {brightness}|Helligkeit: {brightness}|brightness=104
+Asteroids: {asteroid_type} (density: {asteroid_density})|Ästeroiden: {asteroid_type} (density: {asteroid_density})|asteroid_type=carbon|asteroid_density=3
+Links:|Ausfahrten:
+	[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=0|link_drag=170
+	[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=4|link_drag=32
+	[{index}] (faction: {faction}) drag: {link_drag}|       [{index}] (faction: {faction}) drag: {link_drag}|index=5|faction=nibiru|link_drag=90
+	[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=7|link_drag=51
+Planets:|Planeten:
+	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=0|planet_type=GAS
+	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=1|planet_type=Frozen
+	[{index}] {name} (faction: {faction}) ({planet_type})|  [{index}] {name} (faction: {faction}) ({planet_type})|index=6|name=notwendig|faction=nibiru|planet_type=Habitable
+	[{index}] ({planet_type})|      [{index}] ({planet_type})|index=2|planet_type=Barren
+Structures:|Strukturen:
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=123|name=abc's Ship|sclass=AST
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=456|name=Moonlight on Window|sclass=GAX
+	{id} {name} [{sclass}]| {id} {name} [{sclass}]|id=789|name=Consider Phlebus|sclass=SAT
+	{id} {name}|    {id} {name}|id=360|name=hafen-9

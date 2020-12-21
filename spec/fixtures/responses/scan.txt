@@ -1,0 +1,19 @@
+{id} {name}|{id} {name}|id=1|name=abc's Ship
+Owner: {username}|Besitzer: {username}|username=abc
+Operators:|Fährer:
+	{username}|     {username}|username=abc
+Outfit space: {space}|Geräteschlitze: {space}|space=8
+Shield charge: {charge}|Schildladung: {charge}|charge=0.0
+Outfits:|Geräte:
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=0|name=Fusion Reactor|mark=1|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=1|name=Solar Array|mark=1|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=2|name=Coolant Pump|mark=2|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=3|name=Shield Matrix|mark=3|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=4|name=Warp Engine|mark=4|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=5|name=Antigravity Engine|mark=5|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=6|name=Mining Beam|mark=6|setting=0
+	[{index}] {name} mark {mark} (setting {setting})|       [{index}] {name} mark {mark} (setting {setting})|index=7|name=Assembler|mark=7|setting=0
+Cargo:|Fracht:
+	[{index}] {name} x{count}|      [{index}] {name} x{count}|index=0|name=Hydrogen Fuel Cell|count=8
+	[{index}] {name} ({extra}) x{count}|    [{index}] {name} ({extra}) x{count}|index=1|name=Crate|extra=2|count=3
+	[{index}] {name} ({extra}) x{count}|    [{index}] {name} ({extra}) x{count}|index=4|name=Living Spaces|extra=14|count=1

@@ -1,44 +1,160 @@
-# Tfclient
+## TextFlight Client
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tfclient`. To experiment with that code, run `bin/console` for an interactive prompt.
+A command-line client for the TextFlight.
 
-TODO: Delete this and the text above, and describe your gem
+TextFlight is a space-based text adventure MMO.
 
-## Installation
+* https://leagueh.xyz/tf/
+* https://leagueh.xyz/git/textflight/
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'tfclient'
+```
+# TextFlight character
+jmoody
+faction: nibiru
 ```
 
-And then execute:
+One of the first computer games I played was Zork I on an Apple IIc.  The first
+program of any significance that I wrote was a text-based adventure in C# based
+on my experiences as student worker at the Physical Sciences library at UMass
+Amherst.  I played way too much BatMUD in the early nineties and early 2000s.
 
-    $ bundle install
+### Requirements
 
-Or install it yourself as:
+I develop and test on macOS.  The GitHub Actions run rspec tests on Ubuntu.
 
-    $ gem install tfclient
+I install dependencies with Homebrew.
 
-## Usage
+* Ruby >= 2.7.0
+* sqlite3
+* readline
+* socat (essential for debugging)
 
-TODO: Write usage instructions here
+### Developing
 
-## Development
+To run integration tests and debug, a TextFlight server needs to be running
+locally.  There are two options: building the server yourself or using the
+docker container.  Find the instructions for building the server yourself at the
+bottom of this document.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+#### Docker
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+The client has a Docker container that starts the server with SSL enabled.
 
-## Contributing
+```
+$ bundle exec rake server
+docker-compose up --build --remove-orphans
+...
+ssl_1  | 2020-12-09 06:48:58,318 INFO:Loaded quest 'Refueling'.
+ssl_1  | 2020-12-09 06:48:58,318 INFO:Loaded quest 'Base Building'.
+ssl_1  | 2020-12-09 06:48:58,319 INFO:Loaded quest 'Starting Colonies'.
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tfclient. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/tfclient/blob/master/CODE_OF_CONDUCT.md).
+
+The certificate is self-signed, so the client should not try to verify the
+Certificate Authority.
+
+```
+# Connect to the native client: socat
+$ socat readline ssl:localhost:10000,verify=0
+
+^ also a rake task: bundle exec rake socat
+
+# Connect with bin/client.rb
+# --dev flag turns off certificate validation.
+$ bundle exec bin/client.rb --dev
+```
+
+### Test
+
+```
+$ bundle install
+$ bundle exec spec/lib
+```
+
+Integration tests require standing up the TextFlight server locally (see the
+Developing section above).
+
+```
+$ bundle install
+$ bundle  exec spec/integration
+```
+
+### TODO
+
+- [ ] stand up thor to improve cli
+- [ ] improve 'set' command
+  - engines {off | on}
+  - mining {off | on}
+  - prepare to launch
+  - prepare to land
+- [ ] improve the prompt
+- [ ] run 'nav' automatically after jump
+- [ ] handle the craft response
+- [ ] improve craft command (craft all [recipe])
+- [ ] improve the load command (mv all <index> to <structure>)
+
+### Server
+
+#### Build It Yourself
+
+```
+$ git clone https://leagueh.xyz/git/textflight/.git/
+```
+
+The server requires Python 3.x; I use 3.9.0.  I use pyenv to manage Python
+versions. Other than that, I don't know anything about Python (my Algorithms
+class at Smith in 2001 was in Python...) or how to configure Python on macOS.
+There is a little documentation in the textflight/README.md
+
+```
+# Run the server like this:
+$ cd textflight
+$ pip3 install bcrypt
+$ src/main.py
+...
+2020-12-04 23:17:25,110 INFO:Loaded quest 'Base Building'.
+2020-12-04 23:17:25,110 INFO:Loaded quest 'Starting Colonies'.
+
+# In another terminal, connect to the server like this:
+$ socat readline tcp:leagueh.xyz:10000
+```
+
+#### OpenSSL
+
+If you want to use openssl, install with `brew openssl` and use
+`/usr/local/opt/openssl/bin/openssl` instead of Apple's LibreSSL.
 
 
-## License
+```
+1. In the server directory, generate a self-sign cert.
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+$ cd textflight
+$ mkdir -p certs
+# change the -subj
+$ /usr/local/opt/openssl/bin/openssl \
+  req -x509 \
+  -newkey rsa:4096 \
+  -keyout certs/key.pem \
+  -out certs/cert.pem \
+  -days 365 \
+  -nodes \
+  -subj "/C=DE/ST=BW/L=Konstanz/O=nibiru/OU=Org/CN=localhost"
 
-## Code of Conduct
+2. Install a textflight.conf and update the conf to use SSL
+$ cp textflight.conf.example textflight.conf
+SSL = true
+SSLCert = certs/cert.pem
+SSLKey = certs/key.pem
 
-Everyone interacting in the Tfclient project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/tfclient/blob/master/CODE_OF_CONDUCT.md).
+3. Start the server.
+$ src/main.py
+
+4. Connect the client.  Without verify=0, the client will refuse
+   to connect with an error "unknown ca" (certificate authority).
+# Test connection with socat
+$ socat readline ssl:localhost:10000,verify=0
+
+# Or with this client
+$ bin/client.rb --dev
+```
+

@@ -1,3 +1,4 @@
+.env
 *.gem
 *.rbc
 *.rbi
@@ -15,9 +16,7 @@ test/tmp
 test/version_tmp
 tmp
 
-# For a library or gem, you might want to ignore these files since the code is
-# intended to run in multiple environments; otherwise, check them in:
-# Gemfile.lock
+Gemfile.lock
 .ruby-version
 .ruby-gemset
 .bundle
@@ -26,6 +25,7 @@ tmp
 .idea/workspace.xml
 .idea/misc.xml
 .idea/.rakeTasks
+.idea/client.iml
 
 # MacOS
 .DS_Store
@@ -35,3 +35,6 @@ __MACOSX
 (.*/)?\#[^/]*\#$
 *.swp
 *.swo
+
+# A symlink to ../textflight server sources
+textflight
