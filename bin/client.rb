@@ -101,8 +101,6 @@ module TextFlight
       end
 
       buffer
-
-      #buffer.lines(chomp:true)
     end
 
     def self.parse_response(response:)
@@ -165,8 +163,11 @@ module TextFlight
     end
 
     attr_reader :socket, :user, :pass, :host, :port, :tcp, :state, :dev
+    attr_reader :local_db
 
     def initialize(host:, port:, tcp:, user:, pass:, dev:)
+      db_path = TFClient::DotDir.local_database_file(dev: dev)
+      @local_db = TFClient::Models::Local::Database.new(path: db_path)
       @state = { }
       @user = user
       @pass = pass
@@ -183,13 +184,7 @@ module TextFlight
       TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
       TextFlight::CLI.enable_client_mode(socket: @socket)
 
-      status_report = TextFlight::CLI.status(socket: @socket)
-      nav = TextFlight::CLI.nav(socket: @socket)
-
-      @prompt = TFClient::TFPrompt.new(operator: @user,
-                                       status_report: status_report)
-      @prompt.x = nav.coordinates.x
-      @prompt.y = nav.coordinates.y
+      update_prompt!
       read_eval_print
     end
 
@@ -210,23 +205,31 @@ module TextFlight
       socket
     end
 
-    def update_prompt
-      TextFlight::CLI.write_command(socket: socket, command: "status")
+    def update_prompt!
+      TextFlight::CLI.write_command(socket: @socket, command: "status")
       response = TextFlight::CLI.read_response(socket: @socket)
       status = TFClient::ResponseParser.new(command: "status-for-prompt",
                                             textflight_command: "status",
                                             response: response).parse
-      @prompt.mass = status.mass
-      @prompt.warp_charge = status.warp_charge
-      @prompt.shield_charge = status.shield
 
-      TextFlight::CLI.write_command(socket: socket, command: "nav")
-      response = TextFlight::CLI.read_response(socket: @socket)
-      nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
-                                         textflight_command: "nav",
-                                         response: response).parse
-      @prompt.x = nav.coordinates.x
-      @prompt.y = nav.coordinates.y
+      @prompt = TFClient::TFPrompt.new(operator:@user,
+                                       status_report: status.status_report)
+
+      system_id = status.status_report.hash[:sys_id]
+      system = @local_db.system_for_id(id: system_id)
+      if system.count == 0
+        TextFlight::CLI.write_command(socket: socket, command: "nav")
+        response = TextFlight::CLI.read_response(socket: @socket)
+        nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
+                                           textflight_command: "nav",
+                                           response: response).parse
+        system = @local_db.create_system(id: system_id, nav: nav)
+        @prompt.x = system[:x]
+        @prompt.y = system[:y]
+      else
+        @prompt.x = system.first[:x]
+        @prompt.y = system.first[:y]
+      end
     end
 
     def read_eval_print
@@ -234,7 +237,7 @@ module TextFlight
         loop do
           command = Readline.readline("#{@prompt.to_s}", true)
           if command.strip == ""
-            update_prompt
+            update_prompt!
             next
           end
           parsed_command = TFClient::CommandParser.new(command: command).parse
@@ -254,7 +257,7 @@ module TextFlight
                                        textflight_command: parsed_command,
                                        response: response).parse
 
-          update_prompt
+          update_prompt!
         end
       rescue IOError => e
         puts e.message
@@ -280,4 +283,9 @@ else
 end
 pass = ENV["#{env}_PASS"] || "1234"
 
-TextFlight::CLI.new(host: host, port: port, tcp: tcp, user: user, pass: pass, dev: env == "DEV")
+TextFlight::CLI.new(host: host,
+                    port: port,
+                    tcp: tcp,
+                    user: user,
+                    pass: pass,
+                    dev: env == "DEV")

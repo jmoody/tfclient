@@ -133,10 +133,18 @@ module TFClient
         end
 
         # Warp
-        @states[:warp], @engine_status =
-          Status.status_from_lines(lines: lines,
-                                   start_with: "Warp engines")
-        @warp_charge = @status_report.hash[:warp_charge].to_f
+        warp_line = lines.detect do |line|
+          line.strip.start_with?("Warp engines")
+        end
+        if warp_line
+          @states[:warp], @engine_status =
+            Status.status_from_lines(lines: lines,
+                                     start_with: "Warp engines")
+          @warp_charge = @status_report.hash[:warp_charge].to_f
+        else
+          @states[:warp] = "Offline"
+          @warp_charge = 0.0
+        end
 
         # Shield
         shield_status_line = lines.detect do |line|

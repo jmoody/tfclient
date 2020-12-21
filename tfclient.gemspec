@@ -49,6 +49,8 @@ https://leagueh.xyz/git/textflight/
   spec.add_dependency("dotenv", "~> 2.7")
   spec.add_dependency("cousin_roman", "~> 1.0", ">= 1.0.8")
   spec.add_dependency("tty-table", "~> 0.12")
+  spec.add_dependency("sequel","~> 5.39")
+  spec.add_dependency("sqlite3")
   spec.add_development_dependency("awesome_print", "~> 1.8")
   spec.add_development_dependency("bundler", "~> 2.1")
   spec.add_development_dependency("rspec", "~> 3.10")

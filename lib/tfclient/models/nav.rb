@@ -73,7 +73,6 @@ module TFClient
           end
 
           instance_variable_set("@#{var_name}", var)
-          #@response << var.to_s
         end
       end
 
@@ -141,7 +140,7 @@ module TFClient
     end
 
     class Asteroids < Model
-      attr_reader :value, :ore, :density, :percent
+      attr_reader :ore, :density, :percent
 
       def initialize(line:)
         super(line: line)
@@ -156,7 +155,6 @@ module TFClient
     end
 
     class Links < ModelWithItems
-
       def initialize(lines:)
         line, index = ResponseParser.line_and_index_for_beginning_with(lines: lines,
                                                                        string: "Links")

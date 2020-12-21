@@ -1,5 +1,7 @@
 require "tfclient/version"
 require "tfclient/logging"
+require "tfclient/environment"
+require "tfclient/dot_dir"
 require "tfclient/string_utils"
 require "tfclient/command_parser"
 require "tfclient/response_parser"
@@ -8,6 +10,7 @@ require "tfclient/models/nav"
 require "tfclient/models/scan"
 require "tfclient/models/status_report"
 require "tfclient/models/status"
+require "tfclient/models/local"
 require "tfclient/tfprompt"
 
 module TFClient
