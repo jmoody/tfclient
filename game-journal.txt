@@ -13,13 +13,14 @@ Nibiru
 
 12,22 C 5, B 11 - None [ne, n] <= [s, sw]
 10,20 Fe 5, B 152 - None [w] <= [e]
-03,16 C 7, B 14 None
-06,18 C 6, B 111 None
+12,19 Si 5, B 204 - Frozen, Gas, Gas [se] <= [nw]
 
  9,20 U 6  B 157 - None
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren
-12,19 Si 5, B 204 - Frozen, Gas, Gas
+03,16 C 7, B 14 None
+06,18 C 6, B 111 None
+
 12,18 C 4, B 207 - Barren, Gas
 11,21 Fe 4, B 93 - None
 12,20 Fe 1, B 53 - None
@@ -88,20 +89,20 @@ Living Spaces
   - [x] Iron 4         => 128
 
 Shipyard
-                                II      III     IV      V     VII
-- [x] Controller 2              4        8      16      32     64
-  - [ ] Silicon 2      => 2  => 4   =>   8  =>  16 =>   32
+                                II      III     IV      V      VI    VII
+- [x] Controller 2              4        8      16      32     64    128
+  - [ ] Silicon 2      => 2  => 4   =>   8  =>  16 =>   32     64    128
   - [ ] Steel 1
-    - [ ] Iron 4       => 4  => 8   =>  16  =>  32 =>   64
+    - [ ] Iron 4       => 4  => 8   =>  16  =>  32 =>   64     64    128
 
-- [x] Light Material 4    4     8       16      32      64    128
+- [x] Light Material 4    4     8       16      32      64    128    512
   - [ ] Carbon Alloy 4
-     - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512
-     - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512
+     - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512  1024   2048
+     - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512  1024   2048
 
-- [ ] Heavy Plating 4      4    8       16      32      64    128
+- [ ] Heavy Plating 4      4    8       16      32      64    128    512
   - [ ] Carbon Alloy 16
-     - [ ] Iron 4      => 64 => 256 => 512  => 1024 => 2048
-     - [ ] Carbon 4    => 64 => 256 => 512  => 1024 => 2048
-  - [ ] Thermal Pipe 2 => 2  => 4  =>   8  =>  16   =>  32 => 64
+     - [ ] Iron 4      => 64 => 256 => 512  => 1024 => 2048  4096   8182
+     - [ ] Carbon 4    => 64 => 256 => 512  => 1024 => 2048  4096   8192
+  - [ ] Thermal Pipe 2 => 2  => 4  =>   8  =>  16   =>  32 => 64     128
      - [ ] Copper 4    => 4  => 8  =>  16  =>  32   =>  128  Cu

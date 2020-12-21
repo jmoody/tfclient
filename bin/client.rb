@@ -175,7 +175,11 @@ module TextFlight
       @tcp = tcp
       @socket = connect(host: @host, port: @port, tcp: @tcp, dev: dev)
       TextFlight::CLI.read_response(socket: @socket)
-      TextFlight::CLI.register(socket: @socket, user: @user, pass: @pass)
+
+      if dev
+        TextFlight::CLI.register(socket: @socket, user: @user, pass: @pass)
+      end
+
       TextFlight::CLI.login(socket: @socket, user: @user, pass: @pass)
       TextFlight::CLI.enable_client_mode(socket: @socket)
 
@@ -256,7 +260,7 @@ env = ARGV.include?("--dev") ? "DEV" : "TF"
 tcp = ARGV.include?("--tcp")
 host = ENV["#{env}_HOST"] || "localhost"
 port = ENV["#{env}_PORT"] || "10000"
-user = ENV["#{env}_USER"] || "abc"
+user = ARGV[0] || ENV["#{env}_USER"] || "abc"
 pass = ENV["#{env}_PASS"] || "1234"
 
 TextFlight::CLI.new(host: host, port: port, tcp: tcp, user: user, pass: pass, dev: env == "DEV")
