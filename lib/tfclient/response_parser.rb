@@ -133,11 +133,11 @@ module TFClient
       @lines = @response.lines(chomp: true).reject { |line| line.length == 0 }
       case @textflight_command
       when "nav"
-        parse_nav
+        parse_nav(command: @command)
       when "scan"
         parse_scan
       when "status"
-        parse_status
+        parse_status(command: @command)
       else
         if @response[/#{Models::STATUS_BEGIN}/]
           @response = @lines[0].chomp
@@ -148,9 +148,11 @@ module TFClient
       end
     end
 
-    def parse_nav
+    def parse_nav(command:)
       nav = TFClient::Models::Nav.new(lines: lines)
-      puts nav.response
+      if command != "nav-for-prompt"
+        puts nav.response
+      end
       nav
     end
 
@@ -160,34 +162,38 @@ module TFClient
       scan
     end
 
-    def parse_status
-      _, index_start =
-        ResponseParser.line_and_index_for_beginning_with(
-          lines: @lines,
-          string: Models::STATUS_BEGIN
-        )
-      if index_start == -1
-        puts ResponseParser.substitute_values(lines: @lines).join("\n")
-      end
-
-      _, index_end =
-        ResponseParser.line_and_index_for_beginning_with(
-          lines: @lines,
-          string: Models::STATUS_END
-        )
-
-      if index_start != 0
-        lines_before_status = @lines[0..index_start - 1]
-        puts ResponseParser.substitute_values(
-          lines: lines_before_status
-        ).join("\n")
+    def parse_status(command:)
+      if command == "status-for-prompt"
+        TFClient::Models::Status.new(lines: lines)
       else
-        lines_after_status = @lines[index_end + 1..-1]
-        puts ResponseParser.substitute_values(
-          lines: lines_after_status
-        ).join("\n")
+        _, index_start =
+          ResponseParser.line_and_index_for_beginning_with(
+            lines: @lines,
+            string: Models::STATUS_BEGIN
+          )
+        if index_start == -1
+          puts ResponseParser.substitute_values(lines: @lines).join("\n")
+        end
 
-        Models::StatusReport.new(lines: @lines[index_start...index_end])
+        _, index_end =
+          ResponseParser.line_and_index_for_beginning_with(
+            lines: @lines,
+            string: Models::STATUS_END
+          )
+
+        if index_start != 0
+          lines_before_status = @lines[0..index_start - 1]
+          puts ResponseParser.substitute_values(
+            lines: lines_before_status
+          ).join("\n")
+        else
+          lines_after_status = @lines[index_end + 1..-1]
+          puts ResponseParser.substitute_values(
+            lines: lines_after_status
+          ).join("\n")
+
+          Models::StatusReport.new(lines: @lines[index_start...index_end])
+        end
       end
     end
   end

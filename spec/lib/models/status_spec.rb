@@ -214,7 +214,7 @@ RSpec.describe TFClient::Models::Status do
 
   it "returns engine information" do
     expect(status.engine_status).to be == "Warp-Motoren: Laden (25%)"
-    expect(status.engine_charge).to be == 44.0
+    expect(status.warp_charge).to be == 44.0
     expect(status.states[:warp]).to be == "Charging"
   end
 

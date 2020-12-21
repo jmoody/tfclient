@@ -10,7 +10,7 @@ module TFClient
         prefix = start_with.strip
         line, _ = ResponseParser.line_and_index_for_beginning_with(lines: stripped,
                                                                    string: prefix)
-        if !line.start_with?(prefix)
+        if !lines || !line.start_with?(prefix)
           raise "expected line to be a status line for #{prefix} in #{lines}"
         end
 
@@ -57,7 +57,7 @@ module TFClient
       attr_reader :energy, :max_energy, :energy_rate, :power_status
       attr_reader :antigravity_engine_status, :antigravity
       attr_reader :mining_status, :mining_interval, :mining_power
-      attr_reader :engine_status, :engine_charge
+      attr_reader :engine_status, :warp_charge
       attr_reader :shield_status, :shield_max, :shield, :shield_charge_rate
       attr_reader :colonists, :colonists_status
 
@@ -96,9 +96,20 @@ module TFClient
         @energy_rate = @status_report.hash[:energy_rate].to_f
 
         # Antigravity
-        @states[:antigravity], @antigravity_engine_status =
-          Status.status_from_lines(lines: lines, start_with: "Antigravity engines")
-        @antigravity = @status_report.hash[:antigravity].to_i
+        antigravity_line = lines.detect do |line|
+          line.strip.start_with?("Antigravity engines")
+        end
+
+        if antigravity_line
+          @states[:antigravity], @antigravity_engine_status =
+            Status.status_from_lines(lines: lines, start_with: "Antigravity engines")
+          @antigravity = @status_report.hash[:antigravity].to_i
+        else
+          # Needs translation
+          @states[:antigravity] = "Offline"
+          @antigravity = "Antigravity engines: Offline"
+        end
+
 
 
         # Mining
@@ -125,7 +136,7 @@ module TFClient
         @states[:warp], @engine_status =
           Status.status_from_lines(lines: lines,
                                    start_with: "Warp engines")
-        @engine_charge = @status_report.hash[:warp_charge].to_f
+        @warp_charge = @status_report.hash[:warp_charge].to_f
 
         # Shield
         shield_status_line = lines.detect do |line|
@@ -145,7 +156,7 @@ module TFClient
           @states[:shields] = "Offline"
           @shield_charge_rate = nil
           @shield_max = @status_report.hash[:max_shield].to_f
-          @shield = nil
+          @shield = 0
         end
 
         # Colonists

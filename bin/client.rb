@@ -210,11 +210,31 @@ module TextFlight
       socket
     end
 
+    def update_prompt
+      TextFlight::CLI.write_command(socket: socket, command: "status")
+      response = TextFlight::CLI.read_response(socket: @socket)
+      status = TFClient::ResponseParser.new(command: "status-for-prompt",
+                                            textflight_command: "status",
+                                            response: response).parse
+      @prompt.mass = status.mass
+      @prompt.warp_charge = status.warp_charge
+      @prompt.shield_charge = status.shield
+
+      TextFlight::CLI.write_command(socket: socket, command: "nav")
+      response = TextFlight::CLI.read_response(socket: @socket)
+      nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
+                                         textflight_command: "nav",
+                                         response: response).parse
+      @prompt.x = nav.coordinates.x
+      @prompt.y = nav.coordinates.y
+    end
+
     def read_eval_print
       begin
         loop do
           command = Readline.readline("#{@prompt.to_s}", true)
           if command.strip == ""
+            update_prompt
             next
           end
           parsed_command = TFClient::CommandParser.new(command: command).parse
@@ -228,21 +248,13 @@ module TextFlight
 
           TextFlight::CLI.write_command(socket: socket, command: parsed_command)
 
-          # set, jump reply with STATUSREPORT
+          # dock, set, jump reply with STATUSREPORT
           response = TextFlight::CLI.read_response(socket: @socket)
-          instance = TFClient::ResponseParser.new(command: command,
-                                                  textflight_command: parsed_command,
-                                                  response: response).parse
-          if instance.is_a?(TFClient::Models::StatusReport)
-            @prompt.mass = instance.hash[:mass].to_i
-            @prompt.warp_charge = instance.hash[:warp_charge]
-            @prompt.shield_charge = instance.hash[:shield]
-          end
+          TFClient::ResponseParser.new(command: command,
+                                       textflight_command: parsed_command,
+                                       response: response).parse
 
-          if instance.is_a?(TFClient::Models::Nav)
-            @prompt.x = instance.coordinates.x
-            @prompt.y = instance.coordinates.y
-          end
+          update_prompt
         end
       rescue IOError => e
         puts e.message
@@ -260,7 +272,12 @@ env = ARGV.include?("--dev") ? "DEV" : "TF"
 tcp = ARGV.include?("--tcp")
 host = ENV["#{env}_HOST"] || "localhost"
 port = ENV["#{env}_PORT"] || "10000"
-user = ARGV[0] || ENV["#{env}_USER"] || "abc"
+
+if ARGV[0][/--/]
+  user = ENV["#{env}_USER"] || "abc"
+else
+  user = ARGV[0]
+end
 pass = ENV["#{env}_PASS"] || "1234"
 
 TextFlight::CLI.new(host: host, port: port, tcp: tcp, user: user, pass: pass, dev: env == "DEV")
