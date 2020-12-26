@@ -19,6 +19,11 @@ module TFClient
         super(lines: lines)
 
         ship_line = lines[0]
+
+        if ship_line.nil?
+          put lines
+          raise
+        end
         values_hash = ResponseParser.hash_from_line_values(line: ship_line)
         @id = values_hash[:id].to_i
         @name = values_hash[:name]

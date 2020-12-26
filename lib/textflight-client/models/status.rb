@@ -110,8 +110,6 @@ module TFClient
           @antigravity = "Antigravity engines: Offline"
         end
 
-
-
         # Mining
         mining_progress_line = lines.detect do |line|
           line.strip.start_with?("Mining progress")
@@ -185,6 +183,10 @@ module TFClient
           @colonists_status = "Unmanned"
           @colonists = 0
         end
+      end
+
+      def system_id
+        @status_report.hash[:sys_id]
       end
     end
   end

@@ -3,9 +3,9 @@ module TFClient
   class TFPrompt
 
     attr_reader :status_report
-
     attr_reader :operator
-    attr_writer :mass, :warp_charge, :x, :y, :shield_charge
+    attr_accessor :mass, :warp_charge, :x, :y, :shield_charge
+    attr_accessor :system_id
 
     def initialize(operator:, status_report:)
       @operator = operator
@@ -13,6 +13,7 @@ module TFClient
       @mass = status_report.hash[:mass].to_i
       @warp_charge = status_report.hash[:warp_charge]
       @shield_charge = status_report.hash[:shield]
+      @system_id = status_report.hash[:sys_id]
     end
 
     def to_s

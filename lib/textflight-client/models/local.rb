@@ -21,26 +21,27 @@ module TFClient::Models::Local
 
       if !@connection.table_exists?(:systems)
         @connection.create_table(:systems) do
-          primary_key :id
+          primary_key :id, Integer
+          column :system_id, String, index: true
           column :x, Integer
           column :y, Integer
           column :claimed_by, String
           column :brightness, Integer
           column :asteroid_ore, String
           column :asteroid_density, Integer
-          column :links, String
-          column :planets, String
+          column :links, String, text: true
+          column :planets, String, text: true
         end
       end
     end
 
-    def system_for_id(id:)
+    def system_for_id(system_id:)
       table = @connection[:systems]
-      table.where(id: id)
+      table.where(system_id: system_id)
     end
 
-    def create_system(id:, nav:)
-      TFClient.info("creating a new system with id: #{id}")
+    def create_system(system_id:, nav:)
+      TFClient.info("creating a new system with id: #{system_id}")
 
       links = nav.links.items.map do |link|
         [link[:index], link[:direction], link[:drag], link[:faction]]
@@ -53,7 +54,7 @@ module TFClient::Models::Local
       table = @connection[:systems]
       table.insert(
         {
-          id: id,
+          system_id: system_id,
           x: nav.coordinates.x,
           y: nav.coordinates.y,
           claimed_by: nav.claimed_by ? nav.claimed_by.faction : "",

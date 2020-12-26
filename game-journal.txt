@@ -10,12 +10,13 @@
 
 Nibiru
 11,20 Iron 0, B 175 Habitable!!!
+07,20 U 6 U 5, earp (Gas), venus (Gas), biogas base [ne, se, sw, w, ]
 
 12,22 C 5, B 11 - None [ne, n] <= [s, sw]
 10,20 Fe 5, B 152 - None [w] <= [e]
 12,19 Si 5, B 204 - Frozen, Gas, Gas [se] <= [nw]
-
- 9,20 U 6  B 157 - None
+09,21 Cu 5
+09,20 Cu 3  B 157 - None
 10,19 U 2, B 36 - Gas
 11,19 Cu 4, B 140 - Gas, Barren
 03,16 C 7, B 14 None
@@ -31,6 +32,7 @@ Nibiru
 18,15 Cu 6, B 50 - Greenhouse, Gas, Barren
 
 
+07,22
 07,20 U 5, B 88 Greenhouse, Greenhouse
 04,17 Si 7, B 185 Gas Greenhouse
 07,19 U 6, B 208 Gas, Gas, Gas
@@ -89,16 +91,16 @@ Living Spaces
   - [x] Iron 4         => 128
 
 Shipyard
-                                II      III     IV      V      VI    VII
-- [x] Controller 2              4        8      16      32     64    128
-  - [ ] Silicon 2      => 2  => 4   =>   8  =>  16 =>   32     64    128
+                                II      III     IV      V      VI    VII  VIII
+- [x] Controller 2              4        6      8       10     12    14    16
+  - [ ] Silicon 2
   - [ ] Steel 1
-    - [ ] Iron 4       => 4  => 8   =>  16  =>  32 =>   64     64    128
+    - [ ] Iron 4
 
-- [x] Light Material 4    4     8       16      32      64    128    512
+- [x] Light Material 4          8       12     16       20     28    32    16
   - [ ] Carbon Alloy 4
-     - [ ] Iron 4      => 16 => 64  => 128  =>  256 =>  512  1024   2048
-     - [ ] Carbon 4    => 16 => 64  => 128  =>  256 =>  512  1024   2048
+     - [ ] Iron 4
+     - [ ] Carbon 4
 
 - [ ] Heavy Plating 4      4    8       16      32      64    128    512
   - [ ] Carbon Alloy 16

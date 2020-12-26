@@ -215,17 +215,26 @@ module TextFlight
       @prompt = TFClient::TFPrompt.new(operator:@user,
                                        status_report: status.status_report)
 
-      system_id = status.status_report.hash[:sys_id]
-      system = @local_db.system_for_id(id: system_id)
+      system_id = status.system_id
+
+      # We did not move, so don't bother with a #nav request
+      if @prompt.x && @prompt.system_id && @prompt.system_id == system_id
+        return
+      end
+
+      @prompt.system_id = system_id
+
+      system = @local_db.system_for_id(system_id: system_id)
+
       if system.count == 0
         TextFlight::CLI.write_command(socket: socket, command: "nav")
         response = TextFlight::CLI.read_response(socket: @socket)
         nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
                                            textflight_command: "nav",
                                            response: response).parse
-        system = @local_db.create_system(id: system_id, nav: nav)
-        @prompt.x = system[:x]
-        @prompt.y = system[:y]
+        @local_db.create_system(system_id: system_id, nav: nav)
+        @prompt.x = nav.coordinates.x
+        @prompt.y = nav.coordinates.y
       else
         @prompt.x = system.first[:x]
         @prompt.y = system.first[:y]
@@ -251,7 +260,7 @@ module TextFlight
 
           TextFlight::CLI.write_command(socket: socket, command: parsed_command)
 
-          # dock, set, jump reply with STATUSREPORT
+          # rdock, dock, set, jump reply with STATUSREPORT
           response = TextFlight::CLI.read_response(socket: @socket)
           TFClient::ResponseParser.new(command: command,
                                        textflight_command: parsed_command,
