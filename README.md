@@ -18,6 +18,10 @@ program of any significance that I wrote was a text-based adventure in C# based
 on my experiences as student worker at the Physical Sciences library at UMass
 Amherst.  I played way too much BatMUD in the early nineties and early 2000s.
 
+### Attributions
+
+Thank you to https://github.com/brianstorti/ruby-graph-algorithms.
+
 ### Requirements
 
 I develop and test on macOS.  The GitHub Actions run rspec tests on Ubuntu.
