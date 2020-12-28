@@ -66,5 +66,14 @@ module TFClient::Models::Local
         }
       )
     end
+
+    def system_for_coordinates(x:,y:)
+      table = @connection[:systems]
+      table.where((x == x) & (y == y)).first
+    end
+
+    def path_to_system(origin:, destination:)
+
+    end
   end
 end

@@ -39,6 +39,7 @@ module TFClient
       LINE_IDENTIFIER = [
         "Coordinates",
         "Claimed by",
+        "System",
         "Brightness",
         "Asteroids",
         "Links",
@@ -66,7 +67,7 @@ module TFClient
 
           next if line.nil?
 
-          if label_index < 4
+          if label_index < 5
             var = clazz.new(line: line)
           else
             var = clazz.new(lines: @lines)
@@ -80,10 +81,19 @@ module TFClient
         puts @planets
 
         puts @links
+
+        if @system
+          system_str = "#{@system.name}"
+        else
+          system_str = "un-named"
+        end
+
+        system_str = %Q[#{system_str}: (#{@coordinates.x}, #{@coordinates.y})]
+
         table = TTY::Table.new(rows: [[
           "#{@brightness.to_s}",
           "#{@asteroids.to_s}",
-          "#{@coordinates}"]
+          "#{system_str}"]
         ])
 
         puts table.render(:ascii, Models::TABLE_OPTIONS) do |renderer|
@@ -122,6 +132,19 @@ module TFClient
 
       def to_s
         %Q[#{@translation} '#{@faction}']
+      end
+    end
+
+    class System < Model
+      attr_reader :name
+
+      def initialize(line:)
+        super(line: line)
+        @name = @values_hash[:name]
+      end
+
+      def to_s
+        %Q[#{@translation} '#{@name}']
       end
     end
 

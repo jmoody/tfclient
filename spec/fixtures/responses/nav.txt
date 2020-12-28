@@ -1,5 +1,6 @@
 Coordinates: {x},{y}|Koordinaten: {x},{y}|x=1|y=2
 Claimed by '{faction}'.|Beansprucht von '{faction}'.|faction=nibiru
+System: {name}|System: {name}|name=guertel
 Brightness: {brightness}|Helligkeit: {brightness}|brightness=104
 Asteroids: {asteroid_type} (density: {asteroid_density})|Ästeroiden: {asteroid_type} (density: {asteroid_density})|asteroid_type=carbon|asteroid_density=3
 Links:|Ausfahrten:

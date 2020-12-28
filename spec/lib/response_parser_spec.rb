@@ -33,24 +33,27 @@ RSpec.describe TFClient::ResponseParser do
       actual = described_class.hash_from_line_values(line: lines[1])
       expect(actual).to be == {faction: "nibiru"}
 
-      actual = described_class.hash_from_line_values(line: lines[6])
-      expect(actual).to be == {index: "4", link_drag: "32"}
+      actual = described_class.hash_from_line_values(line: lines[2])
+      expect(actual).to be == { name: "guertel" }
 
       actual = described_class.hash_from_line_values(line: lines[7])
+      expect(actual).to be == {index: "4", link_drag: "32"}
+
+      actual = described_class.hash_from_line_values(line: lines[8])
       expect(actual).to be == {index: "5", faction: "nibiru", link_drag: "90"}
 
-      actual = described_class.hash_from_line_values(line: lines[10])
+      actual = described_class.hash_from_line_values(line: lines[11])
       expect(actual).to be == {index: "0", planet_type: "GAS"}
 
-      actual = described_class.hash_from_line_values(line: lines[12])
+      actual = described_class.hash_from_line_values(line: lines[13])
       expect(actual).to be == {
         index: "6", name: "notwendig", faction: "nibiru", planet_type: "Habitable"
       }
 
-      actual = described_class.hash_from_line_values(line: lines[15])
+      actual = described_class.hash_from_line_values(line: lines[16])
       expect(actual).to be == {id: "123", name: "abc's Ship", sclass: "AST"}
 
-      actual = described_class.hash_from_line_values(line: lines[18])
+      actual = described_class.hash_from_line_values(line: lines[19])
       expect(actual).to be == {id: "360", name: "hafen-9"}
     end
   end
@@ -63,7 +66,7 @@ RSpec.describe TFClient::ResponseParser do
 
       line, index = described_class.line_and_index_for_beginning_with(lines: lines, string: "Planets")
       expect(line).to be == "Planets:|Planeten:"
-      expect(index).to be == 9
+      expect(index).to be == 10
     end
 
     it "returns nil, nil if no line begins with label" do
@@ -88,7 +91,7 @@ RSpec.describe TFClient::ResponseParser do
 
   context ".collect_list_items" do
     it "returns lines that are list items until a non-item line is found" do
-      actual = described_class.collect_list_items(lines: lines, start_index: 5)
+      actual = described_class.collect_list_items(lines: lines, start_index: 6)
 
       expected = [
         "[{index}] drag: {link_drag}|    [{index}] drag: {link_drag}|index=0|link_drag=170",
