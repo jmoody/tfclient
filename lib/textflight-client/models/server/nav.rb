@@ -46,7 +46,7 @@ module TFClient::Models::Server
       "Structures"
     ].freeze
 
-    attr_reader :coordinates, :claimed_by, :brightness, :asteroids
+    attr_reader :coordinates, :claimed_by, :brightness, :asteroids, :system
     attr_reader :links, :planets, :structures
 
     def initialize(lines:)
@@ -81,8 +81,10 @@ module TFClient::Models::Server
 
       puts @links
 
-      if @system
-        system_str = "#{@system.name}"
+      # @system generates a warning because it is not always initialized
+      # - sometimes the nav response does not include a system
+      if system
+        system_str = "#{system.name}"
       else
         system_str = "un-named"
       end

@@ -63,4 +63,5 @@ https://leagueh.xyz/git/textflight/
   spec.add_development_dependency("pry", "~> 0.13")
   spec.add_development_dependency("irb", "~> 1.2")
   spec.add_development_dependency("bundler-audit", "~> 0.7")
+  spec.add_development_dependency("command_runner_ng", ">= 0.1.4")
 end

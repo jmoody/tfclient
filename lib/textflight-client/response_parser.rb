@@ -55,13 +55,14 @@ module TFClient
     end
 
     def parse_status(command:)
+      status = TFClient::Models::Server::Status.new(lines: lines)
       if command == "status-for-prompt"
-        TFClient::Models::Server::Status.new(lines: lines)
+        status
       else
-        lines_to_print, status_report =
+        lines_to_print, _ =
           Models::Server::Parser.process_status_report_response(lines: lines)
         puts lines_to_print.join("\n")
-        status_report
+        status
       end
     end
   end
