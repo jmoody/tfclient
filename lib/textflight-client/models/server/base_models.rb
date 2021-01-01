@@ -13,7 +13,7 @@ end
 
 module TFClient::Models::Server::Parser
   FIELD_DELIMITER = "|".freeze
-  VARIABLE_REGEX = /(\{[a-z_]+\}+)/.freeze
+  VARIABLE_REGEX = /({[a-z_]+}+)/.freeze
 
   def substitute_line_values(line:)
     return line.chomp if !line[/\|/]
@@ -46,11 +46,11 @@ module TFClient::Models::Server::Parser
   def tokenize_line(line:)
     lines = line.split(FIELD_DELIMITER)
     stripped = []
-    lines.each_with_index do |line, index|
+    lines.each_with_index do |elm, index|
       if index == 0
-        stripped << line
+        stripped << elm
       else
-        stripped << line.strip
+        stripped << elm.strip
       end
     end
     stripped
@@ -61,6 +61,7 @@ module TFClient::Models::Server::Parser
     lines.each_with_index do |line, index|
       return line.chomp, index if line.start_with?(string)
     end
+    #noinspection RubyUnnecessaryReturnStatement
     return nil, -1
   end
 
@@ -162,6 +163,8 @@ module TFClient::Models::Server::Parser
       status = "Regenerating"
     when "{progress}% ({interval} second interval)"
       status = "Online"
+    else
+      # nop
     end
 
     translation = tokens[1]
@@ -170,6 +173,7 @@ module TFClient::Models::Server::Parser
 
     translation = substitute_line_values(line: line)
 
+    #noinspection RubyUnnecessaryReturnStatement
     return status, translation.strip
   end
 

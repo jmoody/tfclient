@@ -1,3 +1,4 @@
+
 # A very simple priority key implementation to help our Dijkstra algorithm.
 class PriorityQueue
   def initialize

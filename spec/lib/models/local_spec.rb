@@ -24,9 +24,6 @@ RSpec.describe TFClient::Models do
 
       puts system
       expect(system[:claimed_by]).to be == "nibiru"
-
-
     end
-
   end
 end

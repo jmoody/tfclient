@@ -1,6 +1,7 @@
-require_relative "priority_queue"
 
 class Dijkstra
+
+  require_relative "priority_queue"
   def initialize(graph, source_node)
     @graph = graph
     @source_node = source_node
@@ -16,6 +17,7 @@ class Dijkstra
     while node != @source_node
       path.unshift(node)
       node = @path_to[node]
+      puts path
     end
 
     path.unshift(@source_node)
@@ -28,7 +30,7 @@ class Dijkstra
     update_distance_of_all_edges_to(Float::INFINITY)
     @distance_to[@source_node] = 0
 
-    # The prioriy queue holds a node and its distance from the source node.
+    # The priority queue holds a node and its distance from the source node.
     @pq.insert(@source_node, 0)
     while @pq.any?
       node = @pq.remove_min
