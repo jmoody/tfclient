@@ -98,6 +98,8 @@ module TextFlight
             update_prompt!
             next
           end
+
+
           parsed_command = TFClient::CommandParser.new(command: command).parse
 
           if parsed_command == "exit"

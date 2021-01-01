@@ -1,98 +1,117 @@
 
 module TFClient
 
-  class FlightPlanner
+  class Graph
+    require "rgl/dijkstra"
+    require "rgl/dijkstra_visitor"
+    require "rgl/adjacency"
 
+    attr_reader :rgl_graph
+    attr_reader :edge_weights, :edge_weights_lambda
+    attr_reader :directions
+
+    def initialize
+      @edge_weights = {}
+      @edge_weights_lambda = lambda { |edge| @edge_weights[edge] }
+      @directions = {}
+      @rgl_graph = RGL::AdjacencyGraph.new
+    end
+
+    def add_vertex(vertex:)
+      @rgl_graph.add_vertex(vertex)
+    end
+
+    def add_edge(source:, target:, weight:, direction:)
+      @rgl_graph.add_edge(source, target)
+      @edge_weights[[source, target]] = weight
+      @directions[[source, target]] = direction
+    end
+
+    def shortest_path(source:, target:)
+      visitor = RGL::DijkstraVisitor.new(@rgl_graph)
+      dijkstra = RGL::DijkstraAlgorithm.new(@rgl_graph,
+                                            @edge_weights_lambda,
+                                            visitor)
+      vertices = dijkstra.shortest_path(source, target)
+      if vertices.nil? || vertices.empty?
+        nil
+      else
+        directions(vertices: vertices)
+      end
+    end
+
+    def directions(vertices:)
+      directions = []
+      index = 0
+      loop do
+        source = vertices[index]
+        break if source.nil?
+
+        target = vertices[index + 1]
+        break if target.nil?
+
+        direction = @directions[[source, target]] || @directions[[target, source]]
+        if direction.nil?
+          binding.pry
+          raise "Cannot find #{[source, target]} in directions map"
+        end
+
+        directions << direction
+        index = index + 1
+      end
+      directions
+    end
+  end
+
+  class FlightPlanner
     require_relative "./models/client/system"
 
     def self.create_graph
-      graph = Graph.new
+      graph = TFClient::Graph.new
       systems = TFClient::Models::Client::System.find_by_sql("select * from systems")
       systems.each do |system|
-        sys_node = Node.new(system.system_id)
-        graph.add_node(sys_node)
+        graph.add_vertex(vertex: system.system_id)
 
         system.links_array.each do |link|
           direction = link[1]
           weight = link[2]
           link_sys, coord = system.system_in_direction(direction: direction)
           if link_sys.nil?
-            system_id = "coordinate: #{coord.x} #{coord.y}"
+            link_system_id = "coordinate: #{coord.x} #{coord.y}"
           else
-            system_id = link_sys.system_id
+            link_system_id = link_sys.system_id
           end
-
-          link_node = Node.new(system_id)
-          graph.add_node(link_node)
-          graph.add_edge(sys_node, link_node, weight, direction)
+          graph.add_vertex(vertex: link_system_id)
+          graph.add_edge(source: system.system_id,
+                         target: link_system_id,
+                         weight: weight,
+                         direction: direction)
         end
       end
-
       graph
     end
 
-    attr_reader :origin, :destination
-    attr_reader :graph
+    attr_reader :source, :target, :graph
 
-    def initialize(origin:, destination:)
-      @origin = origin
-      @destination = destination
+    def initialize(source:, target:)
+      @source = source
+      @target = target
 
-      if @origin == @destination
+      if @source == @target
         message = <<~EOM
-        origin and destination are the same, you are already at your destination.
+        source and target are the same, you are already at your destination.
         
-             origin: '#{origin}'
-        destination: '#{destination}'
+        target: '#{source}'
+        source: '#{target}'
         EOM
         raise(ArgumentError, message)
       end
 
       @graph = FlightPlanner.create_graph
-
-      @origin_node = @graph.find_node(@origin)
-      @destination_node = @graph.find_node(@destination)
-
-      if @origin_node.nil? || @destination_node.nil?
-        message = <<~EOM
-        origin and destination need to be in the graph:
-
-             origin: '#{@origin}'
-        destination: '#{@destination}'
-        EOM
-
-        raise(ArgumentError, message)
-      end
     end
 
     def plan
-      result = Dijkstra.new(@graph, @origin_node).shortest_path_to(@destination_node)
-      if result.nil? || result.empty?
-        TFClient.log_info(
-          "Could not find a path between #{@origin} and #{@destination}"
-        )
-        nil
-      end
-
-      binding.pry
-
-      directions = []
-      index = 0
-      loop do
-        origin = result[index]
-        destination = result[index + 1]
-        break if destination.nil?
-
-        edge = origin.adjacent_edges.detect do |e|
-          e.from == destination || e.to == destination
-        end
-
-        directions << edge.direction
-
-        index = index + 1
-      end
-
-      directions
+      @graph.shortest_path(source: @source, target: @target)
     end
   end
 end

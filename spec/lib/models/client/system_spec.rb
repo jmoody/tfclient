@@ -110,44 +110,83 @@ RSpec.describe TFClient::Models::Client::System do
   context "create the graph" do
     it "can create a graph" do
       graph = TFClient::FlightPlanner.create_graph
-      expect(graph.edges.count).to be == 212
-      expect(graph.nodes.count).to be == 150
+      expect(graph.rgl_graph.vertices.count).to be == 150
+      expect(graph.rgl_graph.edges.count).to be == 212
+      expect(graph.edge_weights.count).to be == 304
     end
 
     it "the flight planner can create a plan to an adjacent system" do
-
       nibiru = "47244640276"
       iron = "42949672980"
 
-      # directions = TFClient::FlightPlanner.new(origin: nibiru,
-      #                                          destination: iron).plan
-      # expect(directions).to be == ["w"]
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: iron).plan
+      expect(directions).to be == ["w"]
 
-      directions = TFClient::FlightPlanner.new(origin: iron,
-                                               destination: nibiru).plan
+      directions = TFClient::FlightPlanner.new(source: iron,
+                                               target: nibiru).plan
 
       expect(directions).to be == ["e"]
     end
 
-    # it "the flight planner can create a plan to a nearby system" do
-    #   graph = TFClient::FlightPlanner.create_graph
-    #   # expect(graph.edges.count).to be == 212
-    #   # expect(graph.nodes.count).to be == 150
-    #
-    #   nibiru = graph.find_node("47244640276")
-    #   expect(nibiru).to be_truthy
-    #
-    #   carbon = graph.find_node("42949672978")
-    #   expect(carbon).to be_truthy
-    #
-    #   directions = TFClient::FlightPlanner.new(origin: nibiru,
-    #                                            destination: carbon).plan
-    #   expect(directions).to be ==  ["sw", "s"]
-    #
-    # #   directions = TFClient::FlightPlanner.new(origin: carbon,
-    # #                                            destination: nibiru).plan
-    # #
-    # #   expect(directions).to be ==  ["s", "sw"]
-    # end
+    it "the flight planner can create a plan to a nearby system" do
+      nibiru = "47244640276"
+      carbon = "42949672978"
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: carbon).plan
+      expect(directions).to be == ["sw", "s"]
+
+      directions = TFClient::FlightPlanner.new(source: carbon,
+                                               target: nibiru).plan
+
+      expect(directions).to be == ["n", "ne"]
+    end
+
+    it "the flight planner can create a plan to a nearby system" do
+      nibiru = "47244640276"
+      uranium = "30064771091"
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: uranium).plan
+      expect(directions).to be == ["sw", "s", "w", "w", "nw"]
+
+      directions = TFClient::FlightPlanner.new(source: uranium,
+                                               target: nibiru).plan
+
+      expect(directions).to be == ["se", "e", "e", "n", "ne"]
+    end
+
+    it "the flight planner can create a plan to copper" do
+      nibiru = "47244640276"
+      copper = "47244640279"
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: copper).plan
+      expect(directions).to be == ["nw", "n", "ne"]
+
+      directions = TFClient::FlightPlanner.new(source: copper,
+                                               target: nibiru).plan
+
+      expect(directions).to be == ["sw", "s", "se"]
+    end
+
+    it "the flight planner can create a plan to 'greenhouse'" do
+      nibiru = "47244640276"
+      greenhouse = "30064771092"
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: greenhouse).plan
+      expect(directions).to be == ["w", "nw", "s", "nw", "sw"]
+
+      directions = TFClient::FlightPlanner.new(source: greenhouse,
+                                               target: nibiru).plan
+
+      expect(directions).to be == ["ne", "se", "n", "se", "e"]
+    end
+
+    it "the flight planner can create a plan to 'greenhouse'" do
+      nibiru = "47244640276"
+      greenhouse = "0"
+      directions = TFClient::FlightPlanner.new(source: nibiru,
+                                               target: greenhouse).plan
+      expect(directions).to be == nil
+    end
   end
 end

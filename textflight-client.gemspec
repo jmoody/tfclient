@@ -53,6 +53,7 @@ https://leagueh.xyz/git/textflight/
   spec.add_dependency("sequel","~> 5.39")
   spec.add_dependency("sqlite3", "~> 1.4")
   spec.add_dependency("activerecord", "~> 6.1")
+  spec.add_dependency("rgl", ">= 0.5.7", "< 1.0")
   spec.add_development_dependency("awesome_print", "~> 1.8")
   spec.add_development_dependency("bundler", "~> 2.1")
   spec.add_development_dependency("rspec", "~> 3.10")
