@@ -30,3 +30,5 @@ jobs:
       run: bundle exec rake unit
     - name: start server in container
       run: bundle exec rake server
+    - name: run integration tests
+      run: bundle exec rake integration

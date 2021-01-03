@@ -6,7 +6,7 @@ RSpec.describe TFClient::Models do
 
   context "StatusReport" do
     it "can create object from lines" do
-      actual = TFClient::Models::StatusReport.new(lines: lines)
+      actual = TFClient::Models::Server::StatusReport.new(lines: lines)
       puts actual.hash[:name] = "ydoomj's Ship"
       puts actual.hash[:asteroid_type] = "ydoomj's Ship"
     end

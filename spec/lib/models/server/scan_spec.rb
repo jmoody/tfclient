@@ -7,7 +7,7 @@ RSpec.describe TFClient::Models do
   context "Scan" do
     context ".new" do
       it "returns an instance from list of lines" do
-        actual = TFClient::Models::Scan.new(lines: lines)
+        actual = TFClient::Models::Server::Scan.new(lines: lines)
         expect(actual.id).to be == 1
         expect(actual.name).to be == "abc's Ship"
         expect(actual.owner.username).to be == "abc"
@@ -29,7 +29,7 @@ RSpec.describe TFClient::Models do
   context "OutfitSpace" do
     context ".slots_used" do
       it "returns the number of outfit slots used" do
-        actual = TFClient::Models::Outfits.new(lines: lines)
+        actual = TFClient::Models::Server::Outfits.new(lines: lines)
         expect(actual.slots_used).to be == 29
       end
     end

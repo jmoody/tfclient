@@ -1,12 +1,20 @@
 
-RSpec.describe TFClient::Models do
+RSpec.describe TFClient::Models::Server::Nav do
   let(:fixtures_dir) { File.join("spec", "fixtures", "responses") }
   let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
   let(:lines) { nav_response.lines(chomp: true)}
+  let(:parser) do
+    Class.new do
+      include TFClient::Models::Server::Parser
+
+      def to_s; inspect; end
+      def inspect; "#<AnonymousParser>"; end
+    end.new
+  end
 
   context "Nav" do
     it ".new" do
-      actual = TFClient::Models::Nav.new(lines: lines)
+      actual = TFClient::Models::Server::Nav.new(lines: lines)
 
       expect(actual.coordinates.to_s).to be == "Koordinaten: (1,2)"
       expect(actual.claimed_by.faction).to be == "nibiru"
@@ -17,9 +25,9 @@ RSpec.describe TFClient::Models do
 
   context "Coordinates" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                          string: "Coordinates")
-      actual = TFClient::Models::Coordinates.new(line: line)
+      line, _= parser.line_and_index_for_beginning_with(lines: lines,
+                                                                 string: "Coordinates")
+      actual = TFClient::Models::Server::Coordinates.new(line: line)
       expect(actual.label).to be == "Coordinates"
       expect(actual.translation).to be == "Koordinaten"
       expect(actual.x).to be == 1
@@ -31,9 +39,9 @@ RSpec.describe TFClient::Models do
 
   context "ClaimedBy" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                          string: "Claimed by")
-      actual = TFClient::Models::ClaimedBy.new(line: line)
+      line, _= parser.line_and_index_for_beginning_with(lines: lines,
+                                                        string: "Claimed by")
+      actual = TFClient::Models::Server::ClaimedBy.new(line: line)
       expect(actual.label).to be == "Claimed by"
       expect(actual.translation).to be == "Beansprucht von"
       expect(actual.faction).to be == "nibiru"
@@ -44,9 +52,9 @@ RSpec.describe TFClient::Models do
 
   context "Brightness" do
     it ".new can return a valid object from a  line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                          string: "Brightness")
-      actual = TFClient::Models::Brightness.new(line: line)
+      line, _= parser.line_and_index_for_beginning_with(lines: lines,
+                                                        string: "Brightness")
+      actual = TFClient::Models::Server::Brightness.new(line: line)
       expect(actual.label).to be == "Brightness"
       expect(actual.translation).to be == "Helligkeit"
       expect(actual.value).to be == 104
@@ -58,9 +66,9 @@ RSpec.describe TFClient::Models do
 
   context "Asteroid" do
     it ".new can return a valid object from a line" do
-      line, _= TFClient::ResponseParser.line_and_index_for_beginning_with(lines: lines,
-                                                                          string: "Asteroids")
-      actual = TFClient::Models::Asteroids.new(line: line)
+      line, _= parser.line_and_index_for_beginning_with(lines: lines,
+                                                        string: "Asteroids")
+      actual = TFClient::Models::Server::Asteroids.new(line: line)
       expect(actual.label).to be == "Asteroids"
       expect(actual.translation).to be == "Ästeroiden"
       expect(actual.ore).to be == "carbon"
@@ -72,7 +80,7 @@ RSpec.describe TFClient::Models do
 
   context "Links" do
     it ".new can return a valid object from a list of lines" do
-      actual = TFClient::Models::Links.new(lines: lines)
+      actual = TFClient::Models::Server::Links.new(lines: lines)
       expect(actual.label).to be == "Links"
       expect(actual.translation).to be == "Ausfahrten"
       expect(actual.count).to be == 4
@@ -103,7 +111,7 @@ RSpec.describe TFClient::Models do
 
   context "Planets" do
     it ".new can return a valid object from a list of lines" do
-      actual = TFClient::Models::Planets.new(lines: lines)
+      actual = TFClient::Models::Server::Planets.new(lines: lines)
 
       expect(actual.label).to be == "Planets"
       expect(actual.translation).to be == "Planeten"
@@ -134,7 +142,7 @@ RSpec.describe TFClient::Models do
 
   context "Structures" do
     it ".new can return a valid object from a list of lines" do
-      actual = TFClient::Models::Structures.new(lines: lines)
+      actual = TFClient::Models::Server::Structures.new(lines: lines)
 
       expect(actual.label).to be == "Structures"
       expect(actual.translation).to be == "Strukturen"
