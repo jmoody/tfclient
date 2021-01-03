@@ -50,7 +50,6 @@ https://leagueh.xyz/git/textflight/
   spec.add_dependency("dotenv", "~> 2.7")
   spec.add_dependency("cousin_roman", "~> 1.0", ">= 1.0.8")
   spec.add_dependency("tty-table", "~> 0.12")
-  spec.add_dependency("sequel","~> 5.39")
   spec.add_dependency("sqlite3", "~> 1.4")
   spec.add_dependency("activerecord", "~> 6.1")
   spec.add_dependency("rgl", ">= 0.5.7", "< 1.0")

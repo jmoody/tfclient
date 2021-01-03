@@ -57,8 +57,41 @@ module TFClient::Models::Client
   class System < ActiveRecord::Base
     require "json"
 
+    def self.create_system(nav:, system_id:)
+      TFClient.info("creating a new system with id: #{system_id}")
+
+      links = nav.links.items.map do |link|
+        [link[:index], link[:direction], link[:drag], link[:faction]]
+      end
+
+      planets = nav.planets.items.map do |planet|
+        [planet[:index], planet[:type], planet[:name], planet[:faction]]
+      end
+
+      System.create(
+        system_id: system_id,
+        x: nav.coordinates.x,
+        y: nav.coordinates.y,
+        name: nav.system ? nav.system.name : "",
+        claimed_by: nav.claimed_by ? nav.claimed_by.faction : "",
+        brightness: nav.brightness.value,
+        asteroid_ore: nav.asteroids.ore,
+        asteroid_density: nav.asteroids.density,
+        links: JSON.generate(links),
+        planets: JSON.generate(planets)
+      )
+    end
+
     def self.system_for_coordinate(coordinate:)
       System.where("x == ? and y == ?", coordinate.x, coordinate.y).first
+    end
+
+    def self.system_for_id(id:)
+      System.where("system_id == ?", id).first
+    end
+
+    def self.system_for_name(name:)
+      System.where("name == ?", name)
     end
 
     def links_array

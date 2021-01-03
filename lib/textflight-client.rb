@@ -14,7 +14,6 @@ require "textflight-client/models/server/nav"
 require "textflight-client/models/server/scan"
 require "textflight-client/models/server/status_report"
 require "textflight-client/models/server/status"
-require "textflight-client/models/local"
 require "textflight-client/tfprompt"
 require "textflight-client/flight_planner"
 

@@ -107,86 +107,26 @@ RSpec.describe TFClient::Models::Client::System do
     end
   end
 
-  context "create the graph" do
-    it "can create a graph" do
-      graph = TFClient::FlightPlanner.create_graph
-      expect(graph.rgl_graph.vertices.count).to be == 150
-      expect(graph.rgl_graph.edges.count).to be == 212
-      expect(graph.edge_weights.count).to be == 304
+  context ".create_system" do
+    let(:fixtures_dir) { File.join("spec", "fixtures", "responses") }
+    let(:nav_response) { File.read(File.join(fixtures_dir, "nav.txt"))  }
+    let(:nav) do
+      TFClient::Models::Server::Nav.new(lines: nav_response.lines(chomp: true))
     end
 
-    it "the flight planner can create a plan to an adjacent system" do
-      nibiru = "47244640276"
-      iron = "42949672980"
+    it "can create a new system from status and nav" do
+      actual = described_class.create_system(nav: nav,
+                                             system_id: "2156")
+      expect(actual.system_id).to be == "2156"
+      expect(actual.x).to be == 1
+      expect(actual.y).to be == 2
+      expect(actual.claimed_by).to be == "nibiru"
+      expect(actual.name).to be == "guertel"
+      expect(actual.brightness).to be == 104
+      expect(actual.asteroid_ore).to be == "carbon"
+      expect(actual.asteroid_density).to be == 3
 
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: iron).plan
-      expect(directions).to be == ["w"]
-
-      directions = TFClient::FlightPlanner.new(source: iron,
-                                               target: nibiru).plan
-
-      expect(directions).to be == ["e"]
-    end
-
-    it "the flight planner can create a plan to a nearby system" do
-      nibiru = "47244640276"
-      carbon = "42949672978"
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: carbon).plan
-      expect(directions).to be == ["sw", "s"]
-
-      directions = TFClient::FlightPlanner.new(source: carbon,
-                                               target: nibiru).plan
-
-      expect(directions).to be == ["n", "ne"]
-    end
-
-    it "the flight planner can create a plan to a nearby system" do
-      nibiru = "47244640276"
-      uranium = "30064771091"
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: uranium).plan
-      expect(directions).to be == ["sw", "s", "w", "w", "nw"]
-
-      directions = TFClient::FlightPlanner.new(source: uranium,
-                                               target: nibiru).plan
-
-      expect(directions).to be == ["se", "e", "e", "n", "ne"]
-    end
-
-    it "the flight planner can create a plan to copper" do
-      nibiru = "47244640276"
-      copper = "47244640279"
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: copper).plan
-      expect(directions).to be == ["nw", "n", "ne"]
-
-      directions = TFClient::FlightPlanner.new(source: copper,
-                                               target: nibiru).plan
-
-      expect(directions).to be == ["sw", "s", "se"]
-    end
-
-    it "the flight planner can create a plan to 'greenhouse'" do
-      nibiru = "47244640276"
-      greenhouse = "30064771092"
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: greenhouse).plan
-      expect(directions).to be == ["w", "nw", "s", "nw", "sw"]
-
-      directions = TFClient::FlightPlanner.new(source: greenhouse,
-                                               target: nibiru).plan
-
-      expect(directions).to be == ["ne", "se", "n", "se", "e"]
-    end
-
-    it "the flight planner can create a plan to 'greenhouse'" do
-      nibiru = "47244640276"
-      greenhouse = "0"
-      directions = TFClient::FlightPlanner.new(source: nibiru,
-                                               target: greenhouse).plan
-      expect(directions).to be == nil
+      expect(described_class.system_for_id(id: "2156")).to be_truthy
     end
   end
 end

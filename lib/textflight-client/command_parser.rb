@@ -38,5 +38,53 @@ module TFClient
         @command
       end
     end
+
+    def is_plot_course?
+      @command.strip[/plot course to/]
+    end
+
+    def plot_course(x:, y:)
+      destination = @command.strip
+
+      if destination[/(\d+|-\d+){2}/]
+        xy = destination.scan(/\d+|-\d+/).map { |num| num.to_i }
+        coord = TFClient::Models::Client::Coordinate.new(x: xy[0],
+                                                         y: xy[1])
+        target =
+          TFClient::Models::Client::System.system_for_coordinate(coordinate: coord)
+
+        coord = TFClient::Models::Client::Coordinate.new(x: x, y: y)
+        source =
+          TFClient::Models::Client::System.system_for_coordinate(coordinate: coord)
+
+        TFClient::FlightPlanner.new(source: source.system_id,
+                                    target: target.system_id).plan
+      else
+        name = destination.split(" ").last
+        if name == ""
+          puts %Q[Usage: plot course to {<system> | <x> <y>}]
+          return nil
+        end
+
+        system = TFClient::Models::Client::System.system_for_name(name: name)
+        if system.nil? || system.empty?
+          puts %Q[Cannot find system with name '#{name}']
+          return nil
+        elsif system.count != 1
+          puts %Q[Found more than one system with name '#{name}']
+          puts %Q[=> #{system.join(" ")}]
+          return nil
+        else
+          target = system.first
+
+          coord = TFClient::Models::Client::Coordinate.new(x: x, y: y)
+          source =
+            TFClient::Models::Client::System.system_for_coordinate(coordinate: coord)
+
+          TFClient::FlightPlanner.new(source: source.system_id,
+                                      target: target.system_id).plan
+        end
+      end
+    end
   end
 end

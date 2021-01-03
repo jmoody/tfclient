@@ -13,7 +13,8 @@ module TextFlight
 
     def initialize(host:, port:, tcp:, user:, pass:, dev:)
       db_path = TFClient::DotDir.local_database_file(dev: dev)
-      @local_db = TFClient::Models::Local::Database.new(path: db_path)
+      TFClient::Models::Client::Database.connect(path: db_path)
+
       @state = { }
       @user = user
       @pass = pass
@@ -37,23 +38,6 @@ module TextFlight
       read_eval_print
     end
 
-    # def connect(host:, port:, tcp:, dev:)
-    #   puts "try to connect to #{host}:#{port} with #{tcp ? "tcp" : "ssl"}"
-    #   if tcp
-    #     socket = TCPSocket.new(host, port)
-    #   else
-    #     ssl_context = OpenSSL::SSL::SSLContext.new
-    #     if dev
-    #       ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    #     end
-    #     tcp_socket = TCPSocket.new(host, port)
-    #     socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
-    #     socket.sync_close = true
-    #     socket.connect
-    #   end
-    #   socket
-    # end
-
     def update_prompt!
       TFClient::IO.write_command(socket: @socket, command: "status")
       response = TFClient::IO.read_response(socket: @socket)
@@ -71,22 +55,28 @@ module TextFlight
         return
       end
 
+      TFClient::IO.write_command(socket: socket, command: "nav")
+      response = TFClient::IO.read_response(socket: @socket)
+      nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
+                                         textflight_command: "nav",
+                                         response: response).parse
+
       @prompt.system_id = system_id
+      system = TFClient::Models::Client::System.system_for_id(id: system_id)
 
-      system = @local_db.system_for_id(system_id: system_id)
-
-      if system.count == 0
-        TFClient::IO.write_command(socket: socket, command: "nav")
-        response = TFClient::IO.read_response(socket: @socket)
-        nav = TFClient::ResponseParser.new(command: "nav-for-prompt",
-                                           textflight_command: "nav",
-                                           response: response).parse
-        @local_db.create_system(system_id: system_id, nav: nav)
+      if system.nil?
+        TFClient::Models::Client::System.create_system(nav: nav,
+                                                       system_id: system_id)
         @prompt.x = nav.coordinates.x
         @prompt.y = nav.coordinates.y
       else
-        @prompt.x = system.first[:x]
-        @prompt.y = system.first[:y]
+        # Things that can change in the system model: claimed_by and name
+        system.update(
+          name: nav.system ? nav.system.name : "",
+          claimed_by: nav.claimed_by ? nav.claimed_by.faction : ""
+        )
+        @prompt.x = system.x
+        @prompt.y = system.y
       end
     end
 
@@ -98,9 +88,18 @@ module TextFlight
             update_prompt!
             next
           end
+          parser = TFClient::CommandParser.new(command: command)
 
+          if parser.is_plot_course?
+            plan = parser.plot_course(x: @prompt.x, y: @prompt.y)
+            if plan
+              puts %Q[[#{plan.join(" ")}]]
+            end
+            update_prompt!
+            next
+          end
 
-          parsed_command = TFClient::CommandParser.new(command: command).parse
+          parsed_command = parser.parse
 
           if parsed_command == "exit"
             TFClient::IO.write_command(socket: socket, command: parsed_command)
@@ -113,6 +112,8 @@ module TextFlight
 
           # rdock, dock, set, jump reply with STATUSREPORT
           response = TFClient::IO.read_response(socket: @socket)
+
+          # TFClient::IO.read_response(socket: @socket)
           TFClient::ResponseParser.new(command: command,
                                        textflight_command: parsed_command,
                                        response: response).parse
