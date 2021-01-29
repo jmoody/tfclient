@@ -113,7 +113,6 @@ module TextFlight
           # rdock, dock, set, jump reply with STATUSREPORT
           response = TFClient::IO.read_response(socket: @socket)
 
-          # TFClient::IO.read_response(socket: @socket)
           TFClient::ResponseParser.new(command: command,
                                        textflight_command: parsed_command,
                                        response: response).parse

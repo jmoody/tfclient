@@ -52,7 +52,7 @@ RSpec.describe TFClient::FlightPlanner do
       expect(directions).to be == ["n", "ne"]
     end
 
-    it "the flight planner can create a plan to a nearby system" do
+    it "the flight planner can create a plan to a system with uranium" do
       nibiru = "47244640276"
       uranium = "30064771091"
       directions = TFClient::FlightPlanner.new(source: nibiru,
@@ -91,7 +91,7 @@ RSpec.describe TFClient::FlightPlanner do
       expect(directions).to be == ["ne", "se", "n", "se", "e"]
     end
 
-    it "the flight planner can create a plan to 'greenhouse'" do
+    it "the flight planner returns zero when no path can be found" do
       nibiru = "47244640276"
       greenhouse = "0"
       directions = TFClient::FlightPlanner.new(source: nibiru,

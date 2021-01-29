@@ -21,10 +21,16 @@ module TFClient
     # 6: 180 degrees, X=0, Y=-1 (south)
     # 7: 135 degrees, X=1, Y=-1 (southeast)
 
+    def self.is_jump_command?(command:)
+      DIRECTION_MAP[command.to_sym] || command.start_with?("jump")
+    end
+
     attr_reader :command
+
     def initialize(command:)
       @command = command
     end
+
 
     def parse
       if @command == "quit" || @command == "exit"

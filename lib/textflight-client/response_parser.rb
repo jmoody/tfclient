@@ -15,12 +15,11 @@ module TFClient
 
     def parse
       @lines = @response.lines(chomp: true).reject { |line| line.length == 0 }
-      case @textflight_command
-      when "nav"
+      if @textflight_command == "nav"
         parse_nav(command: @command)
-      when "scan"
+      elsif @textflight_command.start_with?("scan")
         parse_scan
-      when "status"
+      elsif @textflight_command == "status"
         parse_status(command: @command)
       else
         echo_response(command: @command)
